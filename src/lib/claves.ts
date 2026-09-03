@@ -8,4 +8,8 @@ export const claves = {
   disponibilidad: ['disponibilidad'] as const,
   excepciones: ['excepciones'] as const,
   clases: ['clases'] as const,
+  planSesion: (claseId: string) => ['clase', claseId, 'plan'] as const,
+  tareasDeClase: (claseId: string) => ['clase', claseId, 'tareas'] as const,
+  tareasDeAlumno: (alumnoId: string) => ['alumno', alumnoId, 'tareas'] as const,
+  historialAlumno: (alumnoId: string) => ['alumno', alumnoId, 'historial'] as const,
 }

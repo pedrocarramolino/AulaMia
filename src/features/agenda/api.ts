@@ -64,6 +64,27 @@ export function useClasesRango(
   })
 }
 
+export type ClaseHistorial = ClaseAgenda & {
+  plan_sesion: { tema: string | null; nivel_progreso: number | null } | null
+}
+
+export function useClasesDeAlumno(alumnoId: string | undefined) {
+  return useQuery({
+    queryKey: claves.historialAlumno(alumnoId ?? ''),
+    enabled: !!alumnoId,
+    queryFn: async (): Promise<ClaseHistorial[]> => {
+      const { data, error } = await supabase
+        .from('clase')
+        .select(`${SELECT}, plan_sesion:plan_sesion(tema, nivel_progreso)`)
+        .eq('alumno_id', alumnoId!)
+        .order('fecha', { ascending: false })
+        .order('hora_inicio', { ascending: false })
+      if (error) throw error
+      return data as ClaseHistorial[]
+    },
+  })
+}
+
 export function useClase(id: string | undefined) {
   return useQuery({
     queryKey: [...claves.clases, 'detalle', id],

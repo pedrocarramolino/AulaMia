@@ -15,6 +15,8 @@ import { PillEstado } from './componentes'
 import { ORIGEN } from './estado'
 import { CancelarDialogo, MoverDialogo, RecuperarDialogo } from './dialogos'
 import { HistorialCambios } from './HistorialCambios'
+import { PlanSesion } from '@/features/plan/PlanSesion'
+import { TareasDeClase } from '@/features/plan/Tareas'
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
@@ -202,6 +204,11 @@ export function PaginaClase() {
           </Link>
         </p>
       )}
+
+      <div className="mt-5 flex flex-col gap-4">
+        <PlanSesion claseId={clase.id} />
+        <TareasDeClase claseId={clase.id} alumnoId={clase.alumno_id} />
+      </div>
 
       <HistorialCambios claseId={clase.id} />
 
