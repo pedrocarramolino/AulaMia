@@ -30,15 +30,12 @@ export function Acceso() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-ground px-5">
       <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <img
-            src="/pwa-512.png"
-            alt="AulaMia"
-            width={120}
-            height={120}
-            className="mx-auto rounded-3xl shadow-sm"
-          />
-          <p className="mt-3 text-sm text-muted">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <img src="/pwa-512.png" alt="" width={96} height={96} className="rounded-2xl" />
+          <span className="mt-2 font-display text-2xl font-bold tracking-tight text-ink">
+            Aula<span className="text-accent-ink">Mia</span>
+          </span>
+          <p className="mt-1 text-sm text-muted">
             Agenda y planificador de clases de repaso
           </p>
         </div>
