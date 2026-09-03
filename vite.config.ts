@@ -30,6 +30,9 @@ export default defineConfig({
       },
       workbox: {
         importScripts: ['push-sw.js'],
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         navigateFallbackDenylist: [/^\/auth/],
         runtimeCaching: [
           {
