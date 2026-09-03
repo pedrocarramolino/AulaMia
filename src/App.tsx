@@ -1,74 +1,113 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from '@/auth/AuthProvider'
 import { RutaProtegida } from '@/components/RutaProtegida'
 import { AppLayout } from '@/components/AppLayout'
+import { Cargando } from '@/components/ui'
 import { Acceso } from '@/pages/Acceso'
-import { Mas } from '@/pages/Mas'
-import { Ajustes } from '@/pages/Ajustes'
-import { PaginaListaAlumnos } from '@/features/alumnos/PaginaListaAlumnos'
-import { PaginaEditorAlumno } from '@/features/alumnos/PaginaEditorAlumno'
-import { PaginaFichaAlumno } from '@/features/alumnos/PaginaFichaAlumno'
-import { PaginaMaterias } from '@/features/materias/PaginaMaterias'
-import { PaginaDisponibilidad } from '@/features/disponibilidad/PaginaDisponibilidad'
-import { PaginaAgenda } from '@/features/agenda/PaginaAgenda'
-import { PaginaClase } from '@/features/agenda/PaginaClase'
-import { EditorClase } from '@/features/agenda/EditorClase'
-import { PaginaHoy } from '@/features/panel/PaginaHoy'
-import { PaginaExamenes } from '@/features/examenes/PaginaExamenes'
-import { PaginaExamen } from '@/features/examenes/PaginaExamen'
-import { EditorExamen } from '@/features/examenes/EditorExamen'
-import { PaginaPlanificador } from '@/features/planificador/PaginaPlanificador'
-import { PaginaEstadisticas } from '@/features/estadisticas/PaginaEstadisticas'
+
+const PaginaHoy = lazy(() =>
+  import('@/features/panel/PaginaHoy').then((m) => ({ default: m.PaginaHoy })),
+)
+const PaginaAgenda = lazy(() =>
+  import('@/features/agenda/PaginaAgenda').then((m) => ({ default: m.PaginaAgenda })),
+)
+const PaginaClase = lazy(() =>
+  import('@/features/agenda/PaginaClase').then((m) => ({ default: m.PaginaClase })),
+)
+const EditorClase = lazy(() =>
+  import('@/features/agenda/EditorClase').then((m) => ({ default: m.EditorClase })),
+)
+const PaginaListaAlumnos = lazy(() =>
+  import('@/features/alumnos/PaginaListaAlumnos').then((m) => ({ default: m.PaginaListaAlumnos })),
+)
+const PaginaEditorAlumno = lazy(() =>
+  import('@/features/alumnos/PaginaEditorAlumno').then((m) => ({ default: m.PaginaEditorAlumno })),
+)
+const PaginaFichaAlumno = lazy(() =>
+  import('@/features/alumnos/PaginaFichaAlumno').then((m) => ({ default: m.PaginaFichaAlumno })),
+)
+const PaginaExamenes = lazy(() =>
+  import('@/features/examenes/PaginaExamenes').then((m) => ({ default: m.PaginaExamenes })),
+)
+const PaginaExamen = lazy(() =>
+  import('@/features/examenes/PaginaExamen').then((m) => ({ default: m.PaginaExamen })),
+)
+const EditorExamen = lazy(() =>
+  import('@/features/examenes/EditorExamen').then((m) => ({ default: m.EditorExamen })),
+)
+const PaginaMaterias = lazy(() =>
+  import('@/features/materias/PaginaMaterias').then((m) => ({ default: m.PaginaMaterias })),
+)
+const PaginaDisponibilidad = lazy(() =>
+  import('@/features/disponibilidad/PaginaDisponibilidad').then((m) => ({
+    default: m.PaginaDisponibilidad,
+  })),
+)
+const PaginaPlanificador = lazy(() =>
+  import('@/features/planificador/PaginaPlanificador').then((m) => ({
+    default: m.PaginaPlanificador,
+  })),
+)
+const PaginaEstadisticas = lazy(() =>
+  import('@/features/estadisticas/PaginaEstadisticas').then((m) => ({
+    default: m.PaginaEstadisticas,
+  })),
+)
+const Mas = lazy(() => import('@/pages/Mas').then((m) => ({ default: m.Mas })))
+const Ajustes = lazy(() => import('@/pages/Ajustes').then((m) => ({ default: m.Ajustes })))
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/acceso" element={<Acceso />} />
+        <Suspense fallback={<Cargando />}>
+          <Routes>
+            <Route path="/acceso" element={<Acceso />} />
 
-          <Route
-            element={
-              <RutaProtegida>
-                <AppLayout />
-              </RutaProtegida>
-            }
-          >
-            <Route index element={<PaginaHoy />} />
+            <Route
+              element={
+                <RutaProtegida>
+                  <AppLayout />
+                </RutaProtegida>
+              }
+            >
+              <Route index element={<PaginaHoy />} />
 
-            <Route path="agenda">
-              <Route index element={<PaginaAgenda />} />
-              <Route path="nueva" element={<EditorClase />} />
-              <Route path="clase/:id" element={<PaginaClase />} />
-              <Route path="clase/:id/editar" element={<EditorClase />} />
+              <Route path="agenda">
+                <Route index element={<PaginaAgenda />} />
+                <Route path="nueva" element={<EditorClase />} />
+                <Route path="clase/:id" element={<PaginaClase />} />
+                <Route path="clase/:id/editar" element={<EditorClase />} />
+              </Route>
+
+              <Route path="alumnos">
+                <Route index element={<PaginaListaAlumnos />} />
+                <Route path="nuevo" element={<PaginaEditorAlumno />} />
+                <Route path=":id" element={<PaginaFichaAlumno />} />
+                <Route path=":id/editar" element={<PaginaEditorAlumno />} />
+              </Route>
+
+              <Route path="examenes">
+                <Route index element={<PaginaExamenes />} />
+                <Route path="nuevo" element={<EditorExamen />} />
+                <Route path=":id" element={<PaginaExamen />} />
+                <Route path=":id/editar" element={<EditorExamen />} />
+              </Route>
+
+              <Route path="mas">
+                <Route index element={<Mas />} />
+                <Route path="ajustes" element={<Ajustes />} />
+                <Route path="materias" element={<PaginaMaterias />} />
+                <Route path="disponibilidad" element={<PaginaDisponibilidad />} />
+                <Route path="planificador" element={<PaginaPlanificador />} />
+                <Route path="estadisticas" element={<PaginaEstadisticas />} />
+              </Route>
+
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
-
-            <Route path="alumnos">
-              <Route index element={<PaginaListaAlumnos />} />
-              <Route path="nuevo" element={<PaginaEditorAlumno />} />
-              <Route path=":id" element={<PaginaFichaAlumno />} />
-              <Route path=":id/editar" element={<PaginaEditorAlumno />} />
-            </Route>
-
-            <Route path="examenes">
-              <Route index element={<PaginaExamenes />} />
-              <Route path="nuevo" element={<EditorExamen />} />
-              <Route path=":id" element={<PaginaExamen />} />
-              <Route path=":id/editar" element={<EditorExamen />} />
-            </Route>
-
-            <Route path="mas">
-              <Route index element={<Mas />} />
-              <Route path="ajustes" element={<Ajustes />} />
-              <Route path="materias" element={<PaginaMaterias />} />
-              <Route path="disponibilidad" element={<PaginaDisponibilidad />} />
-              <Route path="planificador" element={<PaginaPlanificador />} />
-              <Route path="estadisticas" element={<PaginaEstadisticas />} />
-            </Route>
-
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Route>
-        </Routes>
+          </Routes>
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   )

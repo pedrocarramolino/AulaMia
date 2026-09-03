@@ -781,6 +781,7 @@ export type Database = {
         Returns: number
       }
       generar_mis_recordatorios: { Args: never; Returns: number }
+      importar_datos: { Args: { p: Json }; Returns: Json }
       mover_clase: {
         Args: {
           p_clase: string

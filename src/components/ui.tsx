@@ -1,5 +1,51 @@
-import { useEffect } from 'react'
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { useEffect, useRef } from 'react'
+import type { ButtonHTMLAttributes, ReactNode, RefObject } from 'react'
+
+/** Foco atrapado dentro de un diálogo mientras está abierto; se restaura al cerrar. */
+function useFocoModal(
+  abierto: boolean,
+  ref: RefObject<HTMLElement | null>,
+  onCerrar: () => void,
+) {
+  useEffect(() => {
+    if (!abierto) return
+    const previo = document.activeElement as HTMLElement | null
+    const cont = ref.current
+    const focos = () =>
+      Array.from(
+        cont?.querySelectorAll<HTMLElement>(
+          'button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter((el) => !el.hasAttribute('disabled'))
+
+    focos()[0]?.focus()
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCerrar()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const f = focos()
+      if (!f.length) return
+      const primero = f[0]
+      const ultimo = f[f.length - 1]
+      if (e.shiftKey && document.activeElement === primero) {
+        e.preventDefault()
+        ultimo.focus()
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
+        e.preventDefault()
+        primero.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      previo?.focus?.()
+    }
+  }, [abierto, ref, onCerrar])
+}
 
 /** Cabecera estándar de una página: título, subtítulo opcional y acción a la derecha. */
 export function CabeceraPagina({
@@ -99,12 +145,8 @@ export function Modal({
   onCerrar: () => void
   children: ReactNode
 }) {
-  useEffect(() => {
-    if (!abierto) return
-    const alPulsar = (e: KeyboardEvent) => e.key === 'Escape' && onCerrar()
-    document.addEventListener('keydown', alPulsar)
-    return () => document.removeEventListener('keydown', alPulsar)
-  }, [abierto, onCerrar])
+  const ref = useRef<HTMLDivElement>(null)
+  useFocoModal(abierto, ref, onCerrar)
 
   if (!abierto) return null
 
@@ -115,6 +157,7 @@ export function Modal({
       role="presentation"
     >
       <div
+        ref={ref}
         className="max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-line bg-surface p-5 shadow-xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -148,12 +191,8 @@ export function ConfirmarDialogo({
   onConfirmar: () => void
   onCancelar: () => void
 }) {
-  useEffect(() => {
-    if (!abierto) return
-    const alPulsar = (e: KeyboardEvent) => e.key === 'Escape' && onCancelar()
-    document.addEventListener('keydown', alPulsar)
-    return () => document.removeEventListener('keydown', alPulsar)
-  }, [abierto, onCancelar])
+  const ref = useRef<HTMLDivElement>(null)
+  useFocoModal(abierto, ref, onCancelar)
 
   if (!abierto) return null
 
@@ -164,6 +203,7 @@ export function ConfirmarDialogo({
       role="presentation"
     >
       <div
+        ref={ref}
         className="w-full max-w-sm rounded-2xl border border-line bg-surface p-5 shadow-xl"
         onClick={(e) => e.stopPropagation()}
         role="alertdialog"

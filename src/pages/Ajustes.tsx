@@ -10,6 +10,8 @@ import {
   IconoFlechaIzq,
 } from '@/components/iconos'
 import { usePreferencias, useGuardarPreferencias } from '@/features/recordatorios/api'
+import { CopiasSeguridad } from '@/features/copias/CopiasSeguridad'
+import { NotificacionesPush } from '@/features/copias/NotificacionesPush'
 
 const DIAS_EXAMEN = [1, 3, 7, 14]
 
@@ -147,15 +149,11 @@ export function Ajustes() {
           </dl>
         </Tarjeta>
 
-        <Tarjeta>
-          <h2 className="font-display text-base font-semibold text-ink">Copias de seguridad</h2>
-          <p className="mt-1 text-sm text-muted">
-            Exportar e importar todos tus datos en JSON. Disponible en la Fase 08. Mientras tanto,
-            Supabase guarda una copia automática cada día.
-          </p>
-        </Tarjeta>
+        <CopiasSeguridad />
 
         <ConfigRecordatorios />
+
+        <NotificacionesPush />
       </div>
     </>
   )

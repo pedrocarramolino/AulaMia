@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['favicon.svg', 'push-sw.js'],
       manifest: {
         name: 'AulaMia',
         short_name: 'AulaMia',
@@ -29,12 +29,21 @@ export default defineConfig({
         ],
       },
       workbox: {
+        importScripts: ['push-sw.js'],
         navigateFallbackDenylist: [/^\/auth/],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/rest/v1'),
             handler: 'NetworkFirst',
             options: { cacheName: 'supabase-rest', networkTimeoutSeconds: 5 },
+          },
+          {
+            urlPattern: ({ request }) => request.destination === 'font',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fuentes',
+              expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 90 },
+            },
           },
         ],
       },

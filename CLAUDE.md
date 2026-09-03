@@ -68,11 +68,22 @@ RLS. En producción el código se elimina en el build.
 
 ## Estado
 
-- Fases 01–07 ✓.
-  - `src/features/planificador/motor.ts` — puro, sin efectos. Scoring + huecos libres.
-  - `src/features/recordatorios/` — reglas en `perfil.preferencias`,
-    `app.generar_recordatorios()` + pg_cron, avisos in-app (`Avisos.tsx` en Hoy).
-    `push_subscription` existe pero Web Push (SW + Edge Function + VAPID) es Fase 08.
-  - `src/features/estadisticas/` — barras simples (div), sin librería de charts.
-- Siguiente: **Fase 08 — Cierre**: Web Push real, cascarón offline PWA,
-  export/import JSON, accesibilidad, code-splitting, pulido.
+**Fases 01–08 completas.** La app cubre toda la hoja de ruta.
+
+- `src/features/planificador/motor.ts` — puro. Scoring + huecos libres.
+- `src/features/recordatorios/` — reglas en `perfil.preferencias`,
+  `app.generar_recordatorios()` + pg_cron, avisos in-app (`Avisos.tsx` en Hoy).
+- `src/features/copias/` — export JSON (cliente) + import (`public.importar_datos`
+  → `app.importar_datos`, desactiva el trigger de resiembra), y suscripción Web Push.
+- **Web Push**: `push-sw.js` (importado por el SW), Edge Function
+  `enviar-recordatorios` (verify_jwt off, auth por `x-cron-secret`), VAPID en
+  `app.app_config` leído vía `public.config_push()` (solo `service_role`).
+- Rutas con `React.lazy` + un único `<Suspense>` en `App.tsx`. Bundle principal ~72 kB gzip.
+- Charts = barras `div`, sin librería.
+
+## Convenciones al añadir cosas
+
+- DDL → `apply_migration` + guardar el `.sql`. Regenerar tipos. `get_advisors` en verde.
+- Función nueva callable por el cliente: si necesita SECURITY DEFINER, ponla en `app.*`
+  y expón un wrapper `public.*` SECURITY INVOKER (patrón de `generar_clases`,
+  `importar_datos`). Así no salta el advisor.

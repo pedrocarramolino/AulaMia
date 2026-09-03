@@ -34,8 +34,27 @@ Proyecto Supabase **AulaMia** (`gudvgxzraisolcpwprlz`, región `eu-west-3`).
 Las migraciones viven en [`supabase/migrations/`](supabase/migrations/) y ya están
 aplicadas en remoto. Todas las tablas tienen RLS: cada usuario solo ve sus filas.
 
+Lógica en el servidor:
+
+- Esquema `app` — funciones internas no expuestas por la API (motor de clases,
+  recordatorios, importación).
+- `pg_cron` — materializa clases (03:15), genera recordatorios (03:30), envía
+  Web Push cada 5 min llamando al Edge Function `enviar-recordatorios`.
+- Edge Function [`enviar-recordatorios`](supabase/functions/enviar-recordatorios/) —
+  Web Push con `web-push` + VAPID. Las claves VAPID viven en `app.app_config`
+  (solo `service_role`); la pública también en `VITE_VAPID_PUBLIC_KEY`.
+
+## Despliegue
+
+Despliegue en Vercel desde el repo. Variables de entorno en producción:
+`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_VAPID_PUBLIC_KEY`.
+Añade la URL de producción a *Auth → URL Configuration* en Supabase.
+
 ## Estado
 
-Fase 01 (Fundamentos) completada: proyecto, esquema completo, acceso por correo,
-navegación, tema claro/oscuro, español y semana en lunes. Ver la hoja de ruta en
-`docs/ARQUITECTURA.md` §8.
+Fases 01–08 completadas: la app está lista para el día a día. Ver la hoja de ruta
+en `docs/ARQUITECTURA.md` §8.
+
+- **Web Push** funciona sobre HTTPS con la PWA instalada; en local (`http://localhost`)
+  el navegador limita las notificaciones.
+- Los datos se pueden **exportar/importar en JSON** desde *Más → Ajustes*.
