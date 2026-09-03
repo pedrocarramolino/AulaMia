@@ -9,9 +9,10 @@ import { AvatarAlumno, EtiquetaPrioridad } from './componentes'
 import { MateriasDeAlumno } from './MateriasDeAlumno'
 import { HorarioDeAlumno } from '@/features/horarios/HorarioDeAlumno'
 import { HistorialAlumno } from './HistorialAlumno'
+import { ExamenesDeAlumno } from '@/features/examenes/ExamenesDeAlumno'
 
-type Pestana = 'datos' | 'materias' | 'horario' | 'historial'
-const PESTANAS: Pestana[] = ['datos', 'materias', 'horario', 'historial']
+type Pestana = 'datos' | 'materias' | 'horario' | 'exámenes' | 'historial'
+const PESTANAS: Pestana[] = ['datos', 'materias', 'horario', 'exámenes', 'historial']
 
 function DatoLinea({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
@@ -113,11 +114,12 @@ export function PaginaFichaAlumno() {
         )}
         {pestana === 'materias' && <MateriasDeAlumno alumnoId={alumno.id} />}
         {pestana === 'horario' && <HorarioDeAlumno alumnoId={alumno.id} />}
+        {pestana === 'exámenes' && <ExamenesDeAlumno alumnoId={alumno.id} />}
         {pestana === 'historial' && <HistorialAlumno alumnoId={alumno.id} />}
       </div>
 
       <p className="mt-8 text-center font-mono text-xs text-muted">
-        Exámenes y estadísticas llegan en próximas fases
+        Las estadísticas llegan en la Fase 07
       </p>
     </>
   )

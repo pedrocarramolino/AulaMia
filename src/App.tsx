@@ -3,8 +3,6 @@ import { AuthProvider } from '@/auth/AuthProvider'
 import { RutaProtegida } from '@/components/RutaProtegida'
 import { AppLayout } from '@/components/AppLayout'
 import { Acceso } from '@/pages/Acceso'
-import { Hoy } from '@/pages/Hoy'
-import { Examenes } from '@/pages/Examenes'
 import { Mas } from '@/pages/Mas'
 import { Ajustes } from '@/pages/Ajustes'
 import { Proximamente } from '@/pages/Proximamente'
@@ -16,6 +14,10 @@ import { PaginaDisponibilidad } from '@/features/disponibilidad/PaginaDisponibil
 import { PaginaAgenda } from '@/features/agenda/PaginaAgenda'
 import { PaginaClase } from '@/features/agenda/PaginaClase'
 import { EditorClase } from '@/features/agenda/EditorClase'
+import { PaginaHoy } from '@/features/panel/PaginaHoy'
+import { PaginaExamenes } from '@/features/examenes/PaginaExamenes'
+import { PaginaExamen } from '@/features/examenes/PaginaExamen'
+import { EditorExamen } from '@/features/examenes/EditorExamen'
 
 export default function App() {
   return (
@@ -31,7 +33,7 @@ export default function App() {
               </RutaProtegida>
             }
           >
-            <Route index element={<Hoy />} />
+            <Route index element={<PaginaHoy />} />
 
             <Route path="agenda">
               <Route index element={<PaginaAgenda />} />
@@ -47,7 +49,12 @@ export default function App() {
               <Route path=":id/editar" element={<PaginaEditorAlumno />} />
             </Route>
 
-            <Route path="examenes" element={<Examenes />} />
+            <Route path="examenes">
+              <Route index element={<PaginaExamenes />} />
+              <Route path="nuevo" element={<EditorExamen />} />
+              <Route path=":id" element={<PaginaExamen />} />
+              <Route path=":id/editar" element={<EditorExamen />} />
+            </Route>
 
             <Route path="mas">
               <Route index element={<Mas />} />

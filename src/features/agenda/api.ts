@@ -85,6 +85,21 @@ export function useClasesDeAlumno(alumnoId: string | undefined) {
   })
 }
 
+export function useClasesPendientesRecuperar() {
+  return useQuery({
+    queryKey: [...claves.clases, 'pendientes-recuperar'],
+    queryFn: async (): Promise<ClaseAgenda[]> => {
+      const { data, error } = await supabase
+        .from('clase')
+        .select(SELECT)
+        .eq('estado', 'pendiente_recuperar')
+        .order('fecha')
+      if (error) throw error
+      return data as ClaseAgenda[]
+    },
+  })
+}
+
 export function useClase(id: string | undefined) {
   return useQuery({
     queryKey: [...claves.clases, 'detalle', id],

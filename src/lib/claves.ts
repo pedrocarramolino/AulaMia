@@ -12,4 +12,9 @@ export const claves = {
   tareasDeClase: (claseId: string) => ['clase', claseId, 'tareas'] as const,
   tareasDeAlumno: (alumnoId: string) => ['alumno', alumnoId, 'tareas'] as const,
   historialAlumno: (alumnoId: string) => ['alumno', alumnoId, 'historial'] as const,
+  examenes: ['examenes'] as const,
+  examen: (id: string) => ['examen', id] as const,
+  planExamen: (examenId: string) => ['examen', examenId, 'plan'] as const,
+  examenesDeAlumno: (alumnoId: string) => ['alumno', alumnoId, 'examenes'] as const,
+  panel: ['panel'] as const,
 }
