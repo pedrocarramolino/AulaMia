@@ -24,6 +24,35 @@ export function useAlumnos(incluirArchivados = false) {
   })
 }
 
+export type AlumnoConMaterias = Pick<
+  Alumno,
+  'id' | 'nombre' | 'apellidos' | 'color' | 'prioridad'
+> & {
+  alumno_materia: {
+    id: string
+    prioridad: number
+    horas_recomendadas: number | null
+    materia: Materia
+  }[]
+}
+
+export function useAlumnosConMaterias() {
+  return useQuery({
+    queryKey: claves.alumnosConMaterias,
+    queryFn: async (): Promise<AlumnoConMaterias[]> => {
+      const { data, error } = await supabase
+        .from('alumno')
+        .select(
+          'id, nombre, apellidos, color, prioridad, alumno_materia(id, prioridad, horas_recomendadas, materia:materia(*))',
+        )
+        .eq('activo', true)
+        .order('nombre')
+      if (error) throw error
+      return data as AlumnoConMaterias[]
+    },
+  })
+}
+
 export function useAlumno(id: string | undefined) {
   return useQuery({
     queryKey: claves.alumno(id ?? ''),

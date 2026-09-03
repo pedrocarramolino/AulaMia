@@ -5,7 +5,6 @@ import { AppLayout } from '@/components/AppLayout'
 import { Acceso } from '@/pages/Acceso'
 import { Mas } from '@/pages/Mas'
 import { Ajustes } from '@/pages/Ajustes'
-import { Proximamente } from '@/pages/Proximamente'
 import { PaginaListaAlumnos } from '@/features/alumnos/PaginaListaAlumnos'
 import { PaginaEditorAlumno } from '@/features/alumnos/PaginaEditorAlumno'
 import { PaginaFichaAlumno } from '@/features/alumnos/PaginaFichaAlumno'
@@ -18,6 +17,8 @@ import { PaginaHoy } from '@/features/panel/PaginaHoy'
 import { PaginaExamenes } from '@/features/examenes/PaginaExamenes'
 import { PaginaExamen } from '@/features/examenes/PaginaExamen'
 import { EditorExamen } from '@/features/examenes/EditorExamen'
+import { PaginaPlanificador } from '@/features/planificador/PaginaPlanificador'
+import { PaginaEstadisticas } from '@/features/estadisticas/PaginaEstadisticas'
 
 export default function App() {
   return (
@@ -61,26 +62,8 @@ export default function App() {
               <Route path="ajustes" element={<Ajustes />} />
               <Route path="materias" element={<PaginaMaterias />} />
               <Route path="disponibilidad" element={<PaginaDisponibilidad />} />
-              <Route
-                path="planificador"
-                element={
-                  <Proximamente
-                    titulo="Planificador inteligente"
-                    fase="Fase 07"
-                    texto="Propone cómo repartir los repasos según tu disponibilidad, los exámenes próximos y la prioridad de cada alumno."
-                  />
-                }
-              />
-              <Route
-                path="estadisticas"
-                element={
-                  <Proximamente
-                    titulo="Estadísticas"
-                    fase="Fase 07"
-                    texto="Horas impartidas, clases realizadas y canceladas, evolución de cada alumno y resumen de tu semana y tu mes."
-                  />
-                }
-              />
+              <Route path="planificador" element={<PaginaPlanificador />} />
+              <Route path="estadisticas" element={<PaginaEstadisticas />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

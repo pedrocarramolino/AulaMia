@@ -636,6 +636,33 @@ export type Database = {
           },
         ]
       }
+      push_subscription: {
+        Row: {
+          auth: string
+          creado_en: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          creado_en?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id?: string
+        }
+        Update: {
+          auth?: string
+          creado_en?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       recordatorio: {
         Row: {
           antelacion_min: number
@@ -753,6 +780,7 @@ export type Database = {
         Args: { p_horizonte_dias?: number }
         Returns: number
       }
+      generar_mis_recordatorios: { Args: never; Returns: number }
       mover_clase: {
         Args: {
           p_clase: string

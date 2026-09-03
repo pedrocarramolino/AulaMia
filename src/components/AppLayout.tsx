@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { NAV } from './navegacion'
 import { useSincronizarClasesAlEntrar } from '@/features/horarios/sincronizacion'
+import { useGenerarRecordatoriosAlEntrar } from '@/features/recordatorios/api'
 
 function claseEnlace(activo: boolean) {
   return [
@@ -20,6 +21,7 @@ function claseTab(activo: boolean) {
 
 export function AppLayout() {
   useSincronizarClasesAlEntrar()
+  useGenerarRecordatoriosAlEntrar()
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[15rem_1fr]">

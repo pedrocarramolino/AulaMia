@@ -17,6 +17,7 @@ import { useClasesRango, useClasesPendientesRecuperar, type ClaseAgenda } from '
 import { useExamenes } from '@/features/examenes/api'
 import { useDisponibilidad } from '@/features/disponibilidad/api'
 import { DiasBadge } from '@/features/examenes/componentes'
+import { Avisos } from '@/features/recordatorios/Avisos'
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 const nowMin = () => {
@@ -42,7 +43,7 @@ function FilaClaseMini({ clase }: { clase: ClaseAgenda }) {
 
 export function PaginaHoy() {
   const navigate = useNavigate()
-  const hoy = new Date()
+  const hoy = useMemo(() => new Date(), [])
   const hoyISO = aISO(hoy)
 
   const { data: semana, isLoading } = useClasesRango(hoyISO, aISO(addDays(hoy, 7)))
@@ -142,6 +143,8 @@ export function PaginaHoy() {
         <div className="h-64 animate-pulse rounded-2xl bg-surface-2" />
       ) : (
         <div className="flex flex-col gap-5">
+          <Avisos />
+
           {/* HOY */}
           <section className="rounded-2xl border border-line bg-surface p-4">
             <p className="font-mono text-[11px] uppercase tracking-wider text-accent-ink">Hoy</p>

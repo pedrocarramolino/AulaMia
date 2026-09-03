@@ -17,4 +17,7 @@ export const claves = {
   planExamen: (examenId: string) => ['examen', examenId, 'plan'] as const,
   examenesDeAlumno: (alumnoId: string) => ['alumno', alumnoId, 'examenes'] as const,
   panel: ['panel'] as const,
+  recordatorios: ['recordatorios'] as const,
+  preferencias: ['preferencias'] as const,
+  alumnosConMaterias: ['alumnos', 'con-materias'] as const,
 }
