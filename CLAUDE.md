@@ -68,6 +68,7 @@ RLS. En producción el código se elimina en el build.
 
 ## Estado
 
-- Fases 01–05 ✓. `src/features/plan/` = plan de sesión (upsert parcial por campo) y
-  tareas. Historial en `src/features/alumnos/HistorialAlumno.tsx`.
-- Siguiente: **Fase 06 — Exámenes y panel principal (Hoy)**.
+- Fases 01–06 ✓. `src/features/examenes/` (CRUD + generador de plan en `generador.ts`,
+  pura). `src/features/panel/PaginaHoy.tsx` compone hooks de agenda/examenes/
+  disponibilidad para el panel. Ficha del alumno = 5 pestañas.
+- Siguiente: **Fase 07 — Planificador inteligente, recordatorios/push y estadísticas**.
