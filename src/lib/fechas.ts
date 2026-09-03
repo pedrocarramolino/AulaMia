@@ -2,6 +2,7 @@ import {
   format,
   formatDistanceToNowStrict,
   differenceInCalendarDays,
+  differenceInYears,
   startOfWeek,
   endOfWeek,
   startOfMonth,
@@ -55,6 +56,12 @@ export function hora(valor: string | Date): string {
 /** `17:00–18:00` */
 export function franja(inicio: string, fin: string): string {
   return `${hora(inicio)}–${hora(fin)}`
+}
+
+/** Edad en años a partir de la fecha de nacimiento (`yyyy-MM-dd` o Date). */
+export function edad(fechaNacimiento: Date | string): number {
+  const d = typeof fechaNacimiento === 'string' ? deISO(fechaNacimiento) : fechaNacimiento
+  return differenceInYears(new Date(), d)
 }
 
 /** Días de calendario entre hoy y una fecha (negativo si ya pasó). */

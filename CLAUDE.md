@@ -36,6 +36,13 @@ pantallas.
   `.claude/launch.json` invocando el binario `node` directo sobre `vite`.
 - `npm run build` hace typecheck completo; déjalo en verde antes de cerrar una fase.
 
+## Vista previa sin sesión (solo desarrollo)
+
+`RutaProtegida` deja pasar sin login si `localStorage['aulamia:preview'] === '1'`
+**y** `import.meta.env.DEV`. Sirve para revisar el diseño; las escrituras fallan por
+RLS. En producción el código se elimina en el build.
+
 ## Estado
 
-Fase 01 completa. Siguiente: **Fase 02 — Alumnos y materias**.
+- Fase 01 ✓ · Fase 02 ✓ (alumnos, materias, asignación de materias por alumno).
+- Siguiente: **Fase 03 — Disponibilidad y horarios recurrentes**.

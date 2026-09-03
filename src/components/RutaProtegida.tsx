@@ -7,8 +7,16 @@ export function RutaProtegida({ children }: { children: ReactNode }) {
   const { session, cargando } = useAuth()
   const location = useLocation()
 
+  // Vista previa de desarrollo: permite recorrer la interfaz sin sesión.
+  // Las llamadas a datos fallarán por RLS; solo sirve para revisar el diseño.
+  const preview =
+    import.meta.env.DEV &&
+    typeof localStorage !== 'undefined' &&
+    localStorage.getItem('aulamia:preview') === '1'
+
   if (cargando) return <Cargando />
-  if (!session) return <Navigate to="/acceso" replace state={{ desde: location.pathname }} />
+  if (!session && !preview)
+    return <Navigate to="/acceso" replace state={{ desde: location.pathname }} />
 
   return <>{children}</>
 }

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 /** Cabecera estándar de una página: título, subtítulo opcional y acción a la derecha. */
@@ -55,24 +56,95 @@ export function Cargando({ texto = 'Cargando…' }: { texto?: string }) {
   )
 }
 
-/** Botón primario. */
+type Variante = 'primario' | 'secundario' | 'peligro' | 'fantasma'
+
+const VARIANTES: Record<Variante, string> = {
+  primario: 'bg-accent text-white hover:brightness-110 active:brightness-95',
+  secundario: 'border border-line-strong bg-surface text-ink hover:bg-surface-2',
+  peligro: 'border border-crit/40 bg-crit-soft text-crit hover:brightness-105',
+  fantasma: 'text-accent-ink hover:bg-accent-soft',
+}
+
+/** Botón. `variante` por defecto: primario. */
 export function Boton({
   children,
   className = '',
+  variante = 'primario',
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement>) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variante?: Variante }) {
   return (
     <button
       className={[
-        'inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5',
-        'text-sm font-semibold text-white transition-[filter,opacity]',
-        'hover:brightness-110 active:brightness-95 disabled:opacity-50',
+        'inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5',
+        'text-sm font-semibold transition-[filter,background-color] disabled:opacity-50',
+        VARIANTES[variante],
         className,
       ].join(' ')}
       {...props}
     >
       {children}
     </button>
+  )
+}
+
+/** Diálogo de confirmación centrado. Se controla con `abierto`. */
+export function ConfirmarDialogo({
+  abierto,
+  titulo,
+  texto,
+  confirmar = 'Confirmar',
+  cancelar = 'Cancelar',
+  peligro = false,
+  onConfirmar,
+  onCancelar,
+}: {
+  abierto: boolean
+  titulo: string
+  texto?: string
+  confirmar?: string
+  cancelar?: string
+  peligro?: boolean
+  onConfirmar: () => void
+  onCancelar: () => void
+}) {
+  useEffect(() => {
+    if (!abierto) return
+    const alPulsar = (e: KeyboardEvent) => e.key === 'Escape' && onCancelar()
+    document.addEventListener('keydown', alPulsar)
+    return () => document.removeEventListener('keydown', alPulsar)
+  }, [abierto, onCancelar])
+
+  if (!abierto) return null
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center"
+      onClick={onCancelar}
+      role="presentation"
+    >
+      <div
+        className="w-full max-w-sm rounded-2xl border border-line bg-surface p-5 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+        role="alertdialog"
+        aria-modal="true"
+        aria-label={titulo}
+      >
+        <h2 className="font-display text-lg font-semibold text-ink">{titulo}</h2>
+        {texto && <p className="mt-1.5 text-sm text-muted">{texto}</p>}
+        <div className="mt-5 flex gap-2">
+          <Boton variante="secundario" className="flex-1" onClick={onCancelar}>
+            {cancelar}
+          </Boton>
+          <Boton
+            variante={peligro ? 'peligro' : 'primario'}
+            className="flex-1"
+            onClick={onConfirmar}
+          >
+            {confirmar}
+          </Boton>
+        </div>
+      </div>
+    </div>
   )
 }
 

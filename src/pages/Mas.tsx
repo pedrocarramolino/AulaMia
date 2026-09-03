@@ -15,7 +15,7 @@ const SECCIONES = [
   { a: '/mas/planificador', etiqueta: 'Planificador inteligente', nota: 'Fase 07', Icono: IconoPlanificador },
   { a: '/mas/disponibilidad', etiqueta: 'Disponibilidad', nota: 'Fase 03', Icono: IconoDisponibilidad },
   { a: '/mas/estadisticas', etiqueta: 'Estadísticas', nota: 'Fase 07', Icono: IconoEstadisticas },
-  { a: '/mas/materias', etiqueta: 'Materias', nota: 'Fase 02', Icono: IconoMateria },
+  { a: '/mas/materias', etiqueta: 'Materias', nota: 'Disponible', Icono: IconoMateria },
   { a: '/mas/ajustes', etiqueta: 'Ajustes', nota: 'Disponible', Icono: IconoAjustes },
 ]
 

@@ -5,11 +5,14 @@ import { AppLayout } from '@/components/AppLayout'
 import { Acceso } from '@/pages/Acceso'
 import { Hoy } from '@/pages/Hoy'
 import { Agenda } from '@/pages/Agenda'
-import { Alumnos } from '@/pages/Alumnos'
 import { Examenes } from '@/pages/Examenes'
 import { Mas } from '@/pages/Mas'
 import { Ajustes } from '@/pages/Ajustes'
 import { Proximamente } from '@/pages/Proximamente'
+import { PaginaListaAlumnos } from '@/features/alumnos/PaginaListaAlumnos'
+import { PaginaEditorAlumno } from '@/features/alumnos/PaginaEditorAlumno'
+import { PaginaFichaAlumno } from '@/features/alumnos/PaginaFichaAlumno'
+import { PaginaMaterias } from '@/features/materias/PaginaMaterias'
 
 export default function App() {
   return (
@@ -27,12 +30,20 @@ export default function App() {
           >
             <Route index element={<Hoy />} />
             <Route path="agenda" element={<Agenda />} />
-            <Route path="alumnos" element={<Alumnos />} />
+
+            <Route path="alumnos">
+              <Route index element={<PaginaListaAlumnos />} />
+              <Route path="nuevo" element={<PaginaEditorAlumno />} />
+              <Route path=":id" element={<PaginaFichaAlumno />} />
+              <Route path=":id/editar" element={<PaginaEditorAlumno />} />
+            </Route>
+
             <Route path="examenes" element={<Examenes />} />
 
             <Route path="mas">
               <Route index element={<Mas />} />
               <Route path="ajustes" element={<Ajustes />} />
+              <Route path="materias" element={<PaginaMaterias />} />
               <Route
                 path="planificador"
                 element={
@@ -60,16 +71,6 @@ export default function App() {
                     titulo="Estadísticas"
                     fase="Fase 07"
                     texto="Horas impartidas, clases realizadas y canceladas, evolución de cada alumno y resumen de tu semana y tu mes."
-                  />
-                }
-              />
-              <Route
-                path="materias"
-                element={
-                  <Proximamente
-                    titulo="Materias"
-                    fase="Fase 02"
-                    texto="Catálogo de materias reutilizables entre alumnos, con su color."
                   />
                 }
               />
