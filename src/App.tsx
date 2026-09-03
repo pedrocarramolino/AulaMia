@@ -4,7 +4,6 @@ import { RutaProtegida } from '@/components/RutaProtegida'
 import { AppLayout } from '@/components/AppLayout'
 import { Acceso } from '@/pages/Acceso'
 import { Hoy } from '@/pages/Hoy'
-import { Agenda } from '@/pages/Agenda'
 import { Examenes } from '@/pages/Examenes'
 import { Mas } from '@/pages/Mas'
 import { Ajustes } from '@/pages/Ajustes'
@@ -14,6 +13,9 @@ import { PaginaEditorAlumno } from '@/features/alumnos/PaginaEditorAlumno'
 import { PaginaFichaAlumno } from '@/features/alumnos/PaginaFichaAlumno'
 import { PaginaMaterias } from '@/features/materias/PaginaMaterias'
 import { PaginaDisponibilidad } from '@/features/disponibilidad/PaginaDisponibilidad'
+import { PaginaAgenda } from '@/features/agenda/PaginaAgenda'
+import { PaginaClase } from '@/features/agenda/PaginaClase'
+import { EditorClase } from '@/features/agenda/EditorClase'
 
 export default function App() {
   return (
@@ -30,7 +32,13 @@ export default function App() {
             }
           >
             <Route index element={<Hoy />} />
-            <Route path="agenda" element={<Agenda />} />
+
+            <Route path="agenda">
+              <Route index element={<PaginaAgenda />} />
+              <Route path="nueva" element={<EditorClase />} />
+              <Route path="clase/:id" element={<PaginaClase />} />
+              <Route path="clase/:id/editar" element={<EditorClase />} />
+            </Route>
 
             <Route path="alumnos">
               <Route index element={<PaginaListaAlumnos />} />

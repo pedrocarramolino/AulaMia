@@ -87,6 +87,47 @@ export function Boton({
   )
 }
 
+/** Contenedor modal genérico (overlay + tarjeta). */
+export function Modal({
+  abierto,
+  titulo,
+  onCerrar,
+  children,
+}: {
+  abierto: boolean
+  titulo: string
+  onCerrar: () => void
+  children: ReactNode
+}) {
+  useEffect(() => {
+    if (!abierto) return
+    const alPulsar = (e: KeyboardEvent) => e.key === 'Escape' && onCerrar()
+    document.addEventListener('keydown', alPulsar)
+    return () => document.removeEventListener('keydown', alPulsar)
+  }, [abierto, onCerrar])
+
+  if (!abierto) return null
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center"
+      onClick={onCerrar}
+      role="presentation"
+    >
+      <div
+        className="max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-line bg-surface p-5 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={titulo}
+      >
+        <h2 className="font-display text-lg font-semibold text-ink">{titulo}</h2>
+        <div className="mt-4">{children}</div>
+      </div>
+    </div>
+  )
+}
+
 /** Diálogo de confirmación centrado. Se controla con `abierto`. */
 export function ConfirmarDialogo({
   abierto,

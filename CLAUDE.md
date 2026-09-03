@@ -55,7 +55,18 @@ RLS. En producción el código se elimina en el build.
 - El solape de clases lo impide la constraint `clase_sin_solape` (SQLSTATE 23P01);
   hay que traducirlo a mensaje amable en la UI (pendiente para Fase 04).
 
+## Agenda (Fase 04)
+
+- `src/features/agenda/`. Rejilla de tiempo propia (`rejilla.ts` + `componentes.tsx`),
+  vistas en `vistas.tsx`, página con estado en la URL (`?v=` / `?f=`).
+- Acciones de clase = RPCs SECURITY INVOKER que actualizan + auditan en `cambio_clase`
+  en una transacción: `cancelar_clase`, `mover_clase`, `recuperar_clase`,
+  `reactivar_clase`. "Marcar realizada" / editar notas/precio = update directo.
+- "Toda la serie" en cancelar/mover = editar/pausar el `horario_recurrente`
+  (dispara la resiembra del motor).
+- `mensajeErrorClase()` traduce la constraint de solape (23P01) a texto amable.
+
 ## Estado
 
-- Fase 01 ✓ · Fase 02 ✓ · Fase 03 ✓ (disponibilidad, horarios recurrentes, motor).
-- Siguiente: **Fase 04 — Agenda (vistas día/semana/mes) y cambios de clase**.
+- Fases 01–04 ✓. Siguiente: **Fase 05 — Planificación del repaso** (plan_sesion,
+  tareas, historial en la ficha del alumno).

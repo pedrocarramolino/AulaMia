@@ -741,9 +741,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cancelar_clase: {
+        Args: {
+          p_clase: string
+          p_motivo?: string
+          p_pendiente_recuperar?: boolean
+        }
+        Returns: undefined
+      }
       generar_mis_clases: {
         Args: { p_horizonte_dias?: number }
         Returns: number
+      }
+      mover_clase: {
+        Args: {
+          p_clase: string
+          p_fecha: string
+          p_hora_fin: string
+          p_hora_inicio: string
+          p_motivo?: string
+        }
+        Returns: undefined
+      }
+      reactivar_clase: { Args: { p_clase: string }; Returns: undefined }
+      recuperar_clase: {
+        Args: {
+          p_clase: string
+          p_fecha: string
+          p_hora_fin: string
+          p_hora_inicio: string
+        }
+        Returns: string
       }
     }
     Enums: {
