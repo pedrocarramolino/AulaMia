@@ -133,8 +133,12 @@ export function PaginaEditorAlumno() {
                 set('nombre', e.target.value)
                 setErrorNombre('')
               }}
+              onBlur={() =>
+                setErrorNombre(form.nombre.trim() ? '' : 'El nombre es obligatorio')
+              }
               autoFocus={!editando}
               autoComplete="off"
+              aria-invalid={!!errorNombre}
             />
           </Campo>
           <Campo etiqueta="Apellidos" htmlFor="apellidos">

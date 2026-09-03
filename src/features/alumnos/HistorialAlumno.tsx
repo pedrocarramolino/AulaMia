@@ -19,7 +19,7 @@ function Fila({ clase, onClick }: { clase: ClaseHistorial; onClick: () => void }
       />
       <div className="w-16 shrink-0">
         <p className="text-xs font-medium text-ink">{fechaCorta(clase.fecha).slice(0, 5)}</p>
-        <p className="font-mono text-[10px] text-muted">{franja(clase.hora_inicio, clase.hora_fin).split('–')[0]}</p>
+        <p className="font-mono text-[11px] text-muted">{franja(clase.hora_inicio, clase.hora_fin).split('–')[0]}</p>
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-ink">

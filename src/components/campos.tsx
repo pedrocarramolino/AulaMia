@@ -34,7 +34,7 @@ export function Campo({
       </label>
       {children}
       {error ? (
-        <p className="text-xs text-crit">{error}</p>
+        <p role="alert" className="text-xs text-crit">{error}</p>
       ) : (
         ayuda && <p className="text-xs text-muted">{ayuda}</p>
       )}

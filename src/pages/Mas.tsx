@@ -37,7 +37,7 @@ export function Mas() {
             >
               <Icono className="size-5 shrink-0 text-muted" />
               <span className="flex-1 font-medium text-ink">{etiqueta}</span>
-              <IconoFlechaDer className="size-4 shrink-0 text-line-strong" />
+              <IconoFlechaDer className="size-4 shrink-0 text-muted" />
             </Link>
           </li>
         ))}

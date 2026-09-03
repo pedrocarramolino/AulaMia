@@ -176,7 +176,7 @@ export function VistaMes({
                   />
                 ))}
                 {activas.length > 4 && (
-                  <span className="text-[9px] font-medium text-muted">
+                  <span className="text-[10px] font-semibold text-muted">
                     +{activas.length - 4}
                   </span>
                 )}

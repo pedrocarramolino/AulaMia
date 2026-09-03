@@ -61,7 +61,7 @@ export function BloqueClase({
         </p>
       )}
       {!compacto && alto > 58 && (
-        <p className="mt-0.5 font-mono text-[10px] text-muted">
+        <p className="mt-0.5 font-mono text-[11px] text-muted">
           {franja(clase.hora_inicio, clase.hora_fin)}
         </p>
       )}

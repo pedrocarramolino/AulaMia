@@ -33,7 +33,7 @@ function FilaExamen({ examen }: { examen: Examen }) {
           )}
         </div>
       </div>
-      <IconoFlechaDer className="size-4 shrink-0 text-line-strong" />
+      <IconoFlechaDer className="size-4 shrink-0 text-muted" />
     </Link>
   )
 }

@@ -11,18 +11,66 @@ type Periodo = '7' | '30' | 'mes'
 
 const dur = (c: ClaseAgenda) => aMinutos(c.hora_fin) - aMinutos(c.hora_inicio)
 
-function Barras({
+type Fila = { etiqueta: string; valor: number; color?: string }
+
+function valorTexto(v: number, unidad: string) {
+  return unidad === 'h' ? `${v.toFixed(1)} h` : String(Math.round(v))
+}
+
+function Grafico({
+  titulo,
   filas,
   unidad = 'h',
+  formato,
 }: {
-  filas: { etiqueta: string; valor: number; color?: string }[]
+  titulo: string
+  filas: Fila[]
   unidad?: string
+  formato: 'grafica' | 'tabla'
 }) {
   const max = Math.max(...filas.map((f) => f.valor), 1)
+  const total = filas.reduce((s, f) => s + f.valor, 0)
+
+  if (formato === 'tabla') {
+    return (
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <caption className="sr-only">{titulo}</caption>
+          <thead>
+            <tr className="border-b border-line text-left text-xs text-muted">
+              <th scope="col" className="py-1.5 font-medium">Concepto</th>
+              <th scope="col" className="py-1.5 text-right font-medium">Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filas.map((f) => (
+              <tr key={f.etiqueta} className="border-b border-line last:border-0">
+                <th scope="row" className="py-1.5 text-left font-normal text-ink">{f.etiqueta}</th>
+                <td className="py-1.5 text-right font-mono tabular-nums text-ink">
+                  {valorTexto(f.valor, unidad)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col gap-2">
+    <div
+      className="flex flex-col gap-2"
+      role="img"
+      aria-label={`${titulo}. ${filas
+        .map((f) => `${f.etiqueta}: ${valorTexto(f.valor, unidad)}`)
+        .join('. ')}. Total ${valorTexto(total, unidad)}.`}
+    >
       {filas.map((f) => (
-        <div key={f.etiqueta} className="flex items-center gap-2 text-sm">
+        <div
+          key={f.etiqueta}
+          className="flex items-center gap-2 text-sm"
+          title={`${f.etiqueta}: ${valorTexto(f.valor, unidad)}`}
+        >
           <span className="w-16 shrink-0 truncate text-xs text-muted">{f.etiqueta}</span>
           <div className="h-5 flex-1 overflow-hidden rounded bg-surface-2">
             <div
@@ -34,8 +82,7 @@ function Barras({
             />
           </div>
           <span className="w-14 shrink-0 text-right font-mono text-xs tabular-nums text-ink">
-            {unidad === 'h' ? f.valor.toFixed(1) : Math.round(f.valor)}
-            {unidad === 'h' ? ' h' : ''}
+            {valorTexto(f.valor, unidad)}
           </span>
         </div>
       ))}
@@ -54,6 +101,7 @@ function Cifra({ k, v }: { k: string; v: string }) {
 
 export function PaginaEstadisticas() {
   const [periodo, setPeriodo] = useState<Periodo>('30')
+  const [formato, setFormato] = useState<'grafica' | 'tabla'>('grafica')
   const hoy = new Date()
 
   const desde =
@@ -138,24 +186,32 @@ export function PaginaEstadisticas() {
       </Link>
       <CabeceraPagina titulo="Estadísticas" />
 
-      <div className="mb-4 inline-flex rounded-xl border border-line-strong bg-ground p-0.5">
-        {(
-          [
-            ['7', '7 días'],
-            ['30', '30 días'],
-            ['mes', 'Este mes'],
-          ] as const
-        ).map(([id, txt]) => (
-          <button
-            key={id}
-            onClick={() => setPeriodo(id)}
-            className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors ${
-              periodo === id ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'
-            }`}
-          >
-            {txt}
-          </button>
-        ))}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="inline-flex rounded-xl border border-line-strong bg-ground p-0.5">
+          {(
+            [
+              ['7', '7 días'],
+              ['30', '30 días'],
+              ['mes', 'Este mes'],
+            ] as const
+          ).map(([id, txt]) => (
+            <button
+              key={id}
+              onClick={() => setPeriodo(id)}
+              className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                periodo === id ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'
+              }`}
+            >
+              {txt}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => setFormato((f) => (f === 'grafica' ? 'tabla' : 'grafica'))}
+          className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-muted hover:bg-surface-2"
+        >
+          {formato === 'grafica' ? 'Ver como tabla' : 'Ver como gráfica'}
+        </button>
       </div>
 
       {isLoading ? (
@@ -173,13 +229,13 @@ export function PaginaEstadisticas() {
             <h2 className="mb-3 font-display text-base font-semibold text-ink">
               Horas por día de la semana
             </h2>
-            <Barras filas={vm.porDia} />
+            <Grafico titulo="Horas por día de la semana" filas={vm.porDia} formato={formato} />
           </Tarjeta>
 
           {vm.porAlumno.length > 0 && (
             <Tarjeta>
               <h2 className="mb-3 font-display text-base font-semibold text-ink">Horas por alumno</h2>
-              <Barras filas={vm.porAlumno} />
+              <Grafico titulo="Horas por alumno" filas={vm.porAlumno} formato={formato} />
             </Tarjeta>
           )}
 
