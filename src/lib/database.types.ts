@@ -27,7 +27,7 @@ export type Database = {
           nivel: string | null
           nombre: string
           observaciones: string | null
-          precio_hora: number | null
+          precio_mensual: number | null
           prioridad: number
           user_id: string
         }
@@ -43,7 +43,7 @@ export type Database = {
           nivel?: string | null
           nombre: string
           observaciones?: string | null
-          precio_hora?: number | null
+          precio_mensual?: number | null
           prioridad?: number
           user_id?: string
         }
@@ -59,7 +59,7 @@ export type Database = {
           nivel?: string | null
           nombre?: string
           observaciones?: string | null
-          precio_hora?: number | null
+          precio_mensual?: number | null
           prioridad?: number
           user_id?: string
         }

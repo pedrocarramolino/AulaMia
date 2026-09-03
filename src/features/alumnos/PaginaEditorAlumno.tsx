@@ -28,7 +28,7 @@ interface Formulario {
   observaciones: string
   color: string
   prioridad: number
-  precio_hora: string
+  precio_mensual: string
 }
 
 const VACIO: Formulario = {
@@ -40,7 +40,7 @@ const VACIO: Formulario = {
   observaciones: '',
   color: COLOR_ALUMNO_POR_DEFECTO,
   prioridad: 2,
-  precio_hora: '',
+  precio_mensual: '',
 }
 
 export function PaginaEditorAlumno() {
@@ -68,7 +68,7 @@ export function PaginaEditorAlumno() {
         observaciones: alumno.observaciones ?? '',
         color: alumno.color,
         prioridad: alumno.prioridad,
-        precio_hora: alumno.precio_hora?.toString() ?? '',
+        precio_mensual: alumno.precio_mensual?.toString() ?? '',
       })
     }
   }, [alumno])
@@ -93,7 +93,7 @@ export function PaginaEditorAlumno() {
       observaciones: form.observaciones.trim() || null,
       color: form.color,
       prioridad: form.prioridad,
-      precio_hora: form.precio_hora ? Number(form.precio_hora) : null,
+      precio_mensual: form.precio_mensual ? Number(form.precio_mensual) : null,
     }
 
     try {
@@ -209,16 +209,16 @@ export function PaginaEditorAlumno() {
           <Campo etiqueta="Prioridad" ayuda="Peso en la planificación de repasos.">
             <SelectorPrioridad valor={form.prioridad} onChange={(v) => set('prioridad', v)} />
           </Campo>
-          <Campo etiqueta="Precio por hora (€)" htmlFor="precio" ayuda="Opcional, para el control económico.">
+          <Campo etiqueta="Precio mensual (€)" htmlFor="precio" ayuda="Cuota mensual del alumno. Opcional.">
             <Input
               id="precio"
               type="number"
               inputMode="decimal"
               min="0"
-              step="0.5"
-              value={form.precio_hora}
-              onChange={(e) => set('precio_hora', e.target.value)}
-              placeholder="Ej. 15"
+              step="1"
+              value={form.precio_mensual}
+              onChange={(e) => set('precio_mensual', e.target.value)}
+              placeholder="Ej. 120"
             />
           </Campo>
         </div>

@@ -32,7 +32,7 @@ export function useHorariosDeAlumno(alumnoId: string | undefined) {
 export function useCrearHorario(alumnoId: string) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (entrada: TablesInsert<'horario_recurrente'>) => {
+    mutationFn: async (entrada: TablesInsert<'horario_recurrente'> | TablesInsert<'horario_recurrente'>[]) => {
       const { error } = await supabase.from('horario_recurrente').insert(entrada)
       if (error) throw error
     },

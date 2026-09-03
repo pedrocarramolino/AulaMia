@@ -6,6 +6,7 @@ import { IconoFlechaIzq } from '@/components/iconos'
 import { aISO, aMinutos, duracionLegible, DIAS_ABREV, diaSemanaISO, deISO } from '@/lib/fechas'
 import { useClasesRango, type ClaseAgenda } from '@/features/agenda/api'
 import { useDisponibilidad } from '@/features/disponibilidad/api'
+import { useAlumnos } from '@/features/alumnos/api'
 
 type Periodo = '7' | '30' | 'mes'
 
@@ -110,6 +111,7 @@ export function PaginaEstadisticas() {
 
   const { data: clases, isLoading } = useClasesRango(desde, hasta, { incluirCanceladas: true })
   const { data: disponibilidad } = useDisponibilidad()
+  const { data: alumnos } = useAlumnos()
 
   const vm = useMemo(() => {
     const lista = clases ?? []
@@ -117,7 +119,7 @@ export function PaginaEstadisticas() {
     const canceladas = lista.filter((c) => c.estado === 'cancelada')
     const minImpartidos = realizadas.reduce((s, c) => s + dur(c), 0)
 
-    const alumnos = new Set(realizadas.map((c) => c.alumno_id))
+    const alumnosRealizadas = new Set(realizadas.map((c) => c.alumno_id))
 
     // horas por día de la semana
     const porDia = DIAS_ABREV.map((d, i) => ({
@@ -154,27 +156,23 @@ export function PaginaEstadisticas() {
     const horasOcup = minImpartidos / 60
     const horasLibres = Math.max(horasDisp - horasOcup, 0)
 
-    const ingresos = realizadas
-      .filter((c) => c.cobrada && c.precio)
-      .reduce((s, c) => s + (c.precio ?? 0), 0)
-    const pendienteCobro = realizadas
-      .filter((c) => !c.cobrada && c.precio)
-      .reduce((s, c) => s + (c.precio ?? 0), 0)
+    const ingresoMensual = (alumnos ?? []).reduce((s, a) => s + (a.precio_mensual ?? 0), 0)
+    const alumnosConPrecio = (alumnos ?? []).filter((a) => a.precio_mensual != null).length
 
     return {
       realizadas: realizadas.length,
       canceladas: canceladas.length,
       minImpartidos,
-      nAlumnos: alumnos.size,
+      nAlumnos: alumnosRealizadas.size,
       porDia,
       porAlumno,
       horasOcup,
       horasLibres,
       horasDisp,
-      ingresos,
-      pendienteCobro,
+      ingresoMensual,
+      alumnosConPrecio,
     }
-  }, [clases, disponibilidad, desde, hasta])
+  }, [clases, disponibilidad, alumnos, desde, hasta])
 
   return (
     <>
@@ -258,19 +256,19 @@ export function PaginaEstadisticas() {
             </div>
           </Tarjeta>
 
-          {(vm.ingresos > 0 || vm.pendienteCobro > 0) && (
+          {vm.ingresoMensual > 0 && (
             <Tarjeta>
-              <h2 className="mb-2 font-display text-base font-semibold text-ink">Cobros</h2>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Cobrado</span>
-                <span className="font-medium text-ink">{vm.ingresos.toFixed(2)} €</span>
+              <h2 className="mb-2 font-display text-base font-semibold text-ink">Ingresos</h2>
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm text-muted">Cuotas mensuales</span>
+                <span className="font-display text-xl font-bold text-ink">
+                  {vm.ingresoMensual.toFixed(0)} €<span className="text-sm font-normal text-muted">/mes</span>
+                </span>
               </div>
-              {vm.pendienteCobro > 0 && (
-                <div className="mt-1 flex justify-between text-sm">
-                  <span className="text-muted">Pendiente</span>
-                  <span className="font-medium text-warn">{vm.pendienteCobro.toFixed(2)} €</span>
-                </div>
-              )}
+              <p className="mt-1 text-xs text-muted">
+                Suma de {vm.alumnosConPrecio}{' '}
+                {vm.alumnosConPrecio === 1 ? 'alumno con precio' : 'alumnos con precio'}.
+              </p>
             </Tarjeta>
           )}
         </div>

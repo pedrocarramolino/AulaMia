@@ -102,8 +102,8 @@ export function PaginaFichaAlumno() {
             <DatoLinea etiqueta="Observaciones" valor={alumno.observaciones || '—'} />
             <DatoLinea etiqueta="Color" valor={nombreColor(alumno.color)} />
             <DatoLinea
-              etiqueta="Precio por hora"
-              valor={alumno.precio_hora != null ? `${alumno.precio_hora} €` : '—'}
+              etiqueta="Precio mensual"
+              valor={alumno.precio_mensual != null ? `${alumno.precio_mensual} €/mes` : '—'}
             />
             <DatoLinea
               etiqueta="Fecha de nacimiento"

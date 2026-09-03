@@ -4,6 +4,7 @@ import { Input, Select } from '@/components/campos'
 import { IconoMas1, IconoAgenda } from '@/components/iconos'
 import {
   DIAS_SEMANA,
+  DIAS_ABREV,
   DURACIONES,
   duracionLegible,
   franja,
@@ -21,7 +22,7 @@ import {
 } from './api'
 
 interface Campos {
-  dia_semana: number
+  dias: number[]
   hora_inicio: string
   duracion_min: number
   materia_id: string
@@ -34,7 +35,7 @@ const hoyISO = () => new Date().toISOString().slice(0, 10)
 
 function camposVacios(): Campos {
   return {
-    dia_semana: 1,
+    dias: [1],
     hora_inicio: '17:00',
     duracion_min: 60,
     materia_id: '',
@@ -44,9 +45,10 @@ function camposVacios(): Campos {
   }
 }
 
-function aPayload(c: Campos) {
-  return {
-    dia_semana: c.dia_semana,
+/** Un payload de horario_recurrente por cada día seleccionado. */
+function aPayloads(c: Campos, alumnoId: string) {
+  const base = {
+    alumno_id: alumnoId,
     hora_inicio: c.hora_inicio,
     duracion_min: c.duracion_min,
     materia_id: c.materia_id || null,
@@ -54,6 +56,49 @@ function aPayload(c: Campos) {
     vigente_hasta: c.vigente_hasta || null,
     precio: c.precio ? Number(c.precio) : null,
   }
+  return c.dias.map((d) => ({ ...base, dia_semana: d }))
+}
+
+function SelectorDias({
+  valor,
+  onChange,
+  multiple,
+}: {
+  valor: number[]
+  onChange: (d: number[]) => void
+  multiple: boolean
+}) {
+  const alternar = (d: number) => {
+    if (!multiple) {
+      onChange([d])
+      return
+    }
+    onChange(valor.includes(d) ? valor.filter((x) => x !== d) : [...valor, d].sort((a, b) => a - b))
+  }
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {DIAS_ABREV.map((abrev, i) => {
+        const dia = i + 1
+        const activo = valor.includes(dia)
+        return (
+          <button
+            key={dia}
+            type="button"
+            aria-pressed={activo}
+            aria-label={DIAS_SEMANA[i]}
+            onClick={() => alternar(dia)}
+            className={`size-9 rounded-lg text-sm font-semibold transition-colors ${
+              activo
+                ? 'bg-accent text-white'
+                : 'border border-line-strong text-muted hover:bg-surface'
+            }`}
+          >
+            {abrev}
+          </button>
+        )
+      })}
+    </div>
+  )
 }
 
 function FormularioHorario({
@@ -63,6 +108,7 @@ function FormularioHorario({
   onCancelar,
   guardando,
   etiquetaGuardar,
+  modo,
 }: {
   alumnoId: string
   inicial: Campos
@@ -70,29 +116,37 @@ function FormularioHorario({
   onCancelar: () => void
   guardando: boolean
   etiquetaGuardar: string
+  modo: 'crear' | 'editar'
 }) {
   const { data: materias } = useMateriasDeAlumno(alumnoId)
   const [c, setC] = useState<Campos>(inicial)
+  const [error, setError] = useState('')
   const set = <K extends keyof Campos>(k: K, v: Campos[K]) => setC((p) => ({ ...p, [k]: v }))
 
   function enviar(e: FormEvent) {
     e.preventDefault()
+    if (c.dias.length === 0) {
+      setError('Elige al menos un día.')
+      return
+    }
+    setError('')
     onGuardar(c)
   }
 
   return (
     <form onSubmit={enviar} className="flex flex-col gap-3 rounded-2xl border border-line bg-surface-2 p-4">
+      <div className="flex flex-col gap-1">
+        <span className="text-xs font-medium text-muted">
+          {modo === 'crear' ? 'Días (uno o varios)' : 'Día'}
+        </span>
+        <SelectorDias
+          valor={c.dias}
+          onChange={(d) => set('dias', d)}
+          multiple={modo === 'crear'}
+        />
+      </div>
+
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="flex flex-col gap-1 text-xs font-medium text-muted">
-          Día
-          <Select value={c.dia_semana} onChange={(e) => set('dia_semana', Number(e.target.value))}>
-            {DIAS_SEMANA.map((d, i) => (
-              <option key={d} value={i + 1}>
-                {d}
-              </option>
-            ))}
-          </Select>
-        </label>
         <label className="flex flex-col gap-1 text-xs font-medium text-muted">
           Hora de inicio
           <Input type="time" value={c.hora_inicio} onChange={(e) => set('hora_inicio', e.target.value)} required />
@@ -131,19 +185,22 @@ function FormularioHorario({
             onChange={(e) => set('vigente_hasta', e.target.value)}
           />
         </label>
+        <label className="flex flex-col gap-1 text-xs font-medium text-muted">
+          Precio de esta clase (€, opcional)
+          <Input
+            type="number"
+            inputMode="decimal"
+            min="0"
+            step="0.5"
+            value={c.precio}
+            onChange={(e) => set('precio', e.target.value)}
+            placeholder="Según el alumno"
+          />
+        </label>
       </div>
-      <label className="flex flex-col gap-1 text-xs font-medium text-muted sm:max-w-[12rem]">
-        Precio de esta clase (€, opcional)
-        <Input
-          type="number"
-          inputMode="decimal"
-          min="0"
-          step="0.5"
-          value={c.precio}
-          onChange={(e) => set('precio', e.target.value)}
-          placeholder="Según el alumno"
-        />
-      </label>
+
+      {error && <p className="text-xs text-crit">{error}</p>}
+
       <div className="flex gap-2">
         <Boton type="submit" disabled={guardando}>
           {guardando ? 'Guardando…' : etiquetaGuardar}
@@ -168,10 +225,11 @@ function FilaHorario({ alumnoId, horario }: { alumnoId: string; horario: Horario
     return (
       <FormularioHorario
         alumnoId={alumnoId}
+        modo="editar"
         guardando={actualizar.isPending}
         etiquetaGuardar="Guardar cambios"
         inicial={{
-          dia_semana: horario.dia_semana,
+          dias: [horario.dia_semana],
           hora_inicio: hora(horario.hora_inicio),
           duracion_min: horario.duracion_min,
           materia_id: horario.materia_id ?? '',
@@ -181,7 +239,9 @@ function FilaHorario({ alumnoId, horario }: { alumnoId: string; horario: Horario
         }}
         onCancelar={() => setEditando(false)}
         onGuardar={async (c) => {
-          await actualizar.mutateAsync({ id: horario.id, cambios: aPayload(c) })
+          const [p] = aPayloads(c, alumnoId)
+          const { alumno_id: _a, ...cambios } = p
+          await actualizar.mutateAsync({ id: horario.id, cambios })
           setEditando(false)
         }}
       />
@@ -217,29 +277,27 @@ function FilaHorario({ alumnoId, horario }: { alumnoId: string; horario: Horario
             </span>
           )}
         </div>
-        <div className="flex shrink-0 gap-1">
-          <button
-            type="button"
-            onClick={() => setEditando(true)}
-            className="rounded-lg px-2 py-1 text-xs font-medium text-accent-ink hover:bg-accent-soft"
-          >
-            Editar
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setEditando(true)}
+          className="shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-accent-ink hover:bg-accent-soft"
+        >
+          Editar
+        </button>
       </div>
 
-      <div className="mt-3 flex gap-3 border-t border-line pt-2.5 text-xs font-medium">
+      <div className="mt-3 flex gap-4 border-t border-line pt-2.5 text-xs font-medium">
         <button
           type="button"
           onClick={() => actualizar.mutate({ id: horario.id, cambios: { activo: !horario.activo } })}
-          className="text-muted hover:text-ink"
+          className="-my-1 py-1 text-muted hover:text-ink"
         >
           {horario.activo ? 'Pausar' : 'Reanudar'}
         </button>
         <button
           type="button"
           onClick={() => setConfirmar(true)}
-          className="text-crit hover:underline"
+          className="-my-1 py-1 text-crit hover:underline"
         >
           Eliminar
         </button>
@@ -287,12 +345,13 @@ export function HorarioDeAlumno({ alumnoId }: { alumnoId: string }) {
       {anadiendo ? (
         <FormularioHorario
           alumnoId={alumnoId}
+          modo="crear"
           guardando={crear.isPending}
           etiquetaGuardar="Añadir horario"
           inicial={camposVacios()}
           onCancelar={() => setAnadiendo(false)}
           onGuardar={async (c) => {
-            await crear.mutateAsync({ alumno_id: alumnoId, ...aPayload(c) })
+            await crear.mutateAsync(aPayloads(c, alumnoId))
             setAnadiendo(false)
           }}
         />
