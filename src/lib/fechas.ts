@@ -58,6 +58,35 @@ export function franja(inicio: string, fin: string): string {
   return `${hora(inicio)}–${hora(fin)}`
 }
 
+/** Minutos desde medianoche de un `HH:MM`. */
+export function aMinutos(hhmm: string): number {
+  const [h, m] = hhmm.slice(0, 5).split(':').map(Number)
+  return h * 60 + m
+}
+
+/** `HH:MM` a partir de minutos desde medianoche. */
+export function deMinutos(min: number): string {
+  const m = ((min % 1440) + 1440) % 1440
+  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
+}
+
+/** Suma minutos a un `HH:MM` y devuelve `HH:MM`. */
+export function sumarMinutos(hhmm: string, min: number): string {
+  return deMinutos(aMinutos(hhmm) + min)
+}
+
+/** `1 h`, `1 h 30 min`, `45 min` */
+export function duracionLegible(min: number): string {
+  const h = Math.floor(min / 60)
+  const m = min % 60
+  if (h && m) return `${h} h ${m} min`
+  if (h) return `${h} h`
+  return `${m} min`
+}
+
+/** Opciones habituales de duración de una clase, en minutos. */
+export const DURACIONES = [30, 45, 60, 75, 90, 120] as const
+
 /** Edad en años a partir de la fecha de nacimiento (`yyyy-MM-dd` o Date). */
 export function edad(fechaNacimiento: Date | string): number {
   const d = typeof fechaNacimiento === 'string' ? deISO(fechaNacimiento) : fechaNacimiento

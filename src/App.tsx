@@ -13,6 +13,7 @@ import { PaginaListaAlumnos } from '@/features/alumnos/PaginaListaAlumnos'
 import { PaginaEditorAlumno } from '@/features/alumnos/PaginaEditorAlumno'
 import { PaginaFichaAlumno } from '@/features/alumnos/PaginaFichaAlumno'
 import { PaginaMaterias } from '@/features/materias/PaginaMaterias'
+import { PaginaDisponibilidad } from '@/features/disponibilidad/PaginaDisponibilidad'
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
               <Route index element={<Mas />} />
               <Route path="ajustes" element={<Ajustes />} />
               <Route path="materias" element={<PaginaMaterias />} />
+              <Route path="disponibilidad" element={<PaginaDisponibilidad />} />
               <Route
                 path="planificador"
                 element={
@@ -51,16 +53,6 @@ export default function App() {
                     titulo="Planificador inteligente"
                     fase="Fase 07"
                     texto="Propone cómo repartir los repasos según tu disponibilidad, los exámenes próximos y la prioridad de cada alumno."
-                  />
-                }
-              />
-              <Route
-                path="disponibilidad"
-                element={
-                  <Proximamente
-                    titulo="Disponibilidad"
-                    fase="Fase 03"
-                    texto="Marca tus horas de trabajo de cada día. La agenda impedirá crear clases fuera de ellas."
                   />
                 }
               />

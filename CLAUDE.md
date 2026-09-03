@@ -42,7 +42,20 @@ pantallas.
 **y** `import.meta.env.DEV`. Sirve para revisar el diseño; las escrituras fallan por
 RLS. En producción el código se elimina en el build.
 
+## Motor de clases (Fase 03)
+
+- `horario_recurrente` = patrón; `clase` = sesiones materializadas (horizonte 8 sem.).
+- `app.generar_clases_para(uuid, int)` (SECURITY DEFINER, esquema `app` no expuesto)
+  hace el trabajo. `public.generar_mis_clases()` es el RPC del cliente (lo llama
+  `useSincronizarClasesAlEntrar` al abrir la app).
+- Triggers en `horario_recurrente` (`app.resembrar_horario`): al crear/editar/borrar
+  un horario, borra las clases futuras `programada` y `not modificada` de esa serie
+  y regenera. No toca las pasadas ni las modificadas.
+- `pg_cron` job `generar-clases-diario` (03:15) regenera para todos los usuarios.
+- El solape de clases lo impide la constraint `clase_sin_solape` (SQLSTATE 23P01);
+  hay que traducirlo a mensaje amable en la UI (pendiente para Fase 04).
+
 ## Estado
 
-- Fase 01 ✓ · Fase 02 ✓ (alumnos, materias, asignación de materias por alumno).
-- Siguiente: **Fase 03 — Disponibilidad y horarios recurrentes**.
+- Fase 01 ✓ · Fase 02 ✓ · Fase 03 ✓ (disponibilidad, horarios recurrentes, motor).
+- Siguiente: **Fase 04 — Agenda (vistas día/semana/mes) y cambios de clase**.

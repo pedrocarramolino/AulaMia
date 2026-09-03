@@ -741,7 +741,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generar_mis_clases: {
+        Args: { p_horizonte_dias?: number }
+        Returns: number
+      }
     }
     Enums: {
       estado_clase:

@@ -7,8 +7,10 @@ import { nombreColor } from '@/lib/colores'
 import { useAlumno } from './api'
 import { AvatarAlumno, EtiquetaPrioridad } from './componentes'
 import { MateriasDeAlumno } from './MateriasDeAlumno'
+import { HorarioDeAlumno } from '@/features/horarios/HorarioDeAlumno'
 
-type Pestana = 'datos' | 'materias'
+type Pestana = 'datos' | 'materias' | 'horario'
+const PESTANAS: Pestana[] = ['datos', 'materias', 'horario']
 
 function DatoLinea({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
@@ -75,7 +77,7 @@ export function PaginaFichaAlumno() {
       </header>
 
       <div className="mt-6 flex gap-1 border-b border-line">
-        {(['datos', 'materias'] as const).map((p) => (
+        {PESTANAS.map((p) => (
           <button
             key={p}
             onClick={() => setPestana(p)}
@@ -92,7 +94,7 @@ export function PaginaFichaAlumno() {
       </div>
 
       <div className="mt-5">
-        {pestana === 'datos' ? (
+        {pestana === 'datos' && (
           <dl className="divide-y divide-line rounded-2xl border border-line bg-surface px-4">
             <DatoLinea etiqueta="Nivel o dificultades" valor={alumno.nivel || '—'} />
             <DatoLinea etiqueta="Observaciones" valor={alumno.observaciones || '—'} />
@@ -107,13 +109,13 @@ export function PaginaFichaAlumno() {
             />
             <DatoLinea etiqueta="Alta en AulaMia" valor={fechaCorta(alumno.creado_en)} />
           </dl>
-        ) : (
-          <MateriasDeAlumno alumnoId={alumno.id} />
         )}
+        {pestana === 'materias' && <MateriasDeAlumno alumnoId={alumno.id} />}
+        {pestana === 'horario' && <HorarioDeAlumno alumnoId={alumno.id} />}
       </div>
 
       <p className="mt-8 text-center font-mono text-xs text-muted">
-        Horario, historial y estadísticas llegan en próximas fases
+        Historial y estadísticas llegan en próximas fases
       </p>
     </>
   )

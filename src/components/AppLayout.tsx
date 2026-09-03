@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { NAV } from './navegacion'
+import { useSincronizarClasesAlEntrar } from '@/features/horarios/sincronizacion'
 
 function claseEnlace(activo: boolean) {
   return [
@@ -18,6 +19,8 @@ function claseTab(activo: boolean) {
 }
 
 export function AppLayout() {
+  useSincronizarClasesAlEntrar()
+
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[15rem_1fr]">
       {/* Barra lateral — escritorio */}
