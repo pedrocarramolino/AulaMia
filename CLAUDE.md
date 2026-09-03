@@ -68,5 +68,6 @@ RLS. En producción el código se elimina en el build.
 
 ## Estado
 
-- Fases 01–04 ✓. Siguiente: **Fase 05 — Planificación del repaso** (plan_sesion,
-  tareas, historial en la ficha del alumno).
+- Fases 01–05 ✓. `src/features/plan/` = plan de sesión (upsert parcial por campo) y
+  tareas. Historial en `src/features/alumnos/HistorialAlumno.tsx`.
+- Siguiente: **Fase 06 — Exámenes y panel principal (Hoy)**.
