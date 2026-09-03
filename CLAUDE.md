@@ -68,7 +68,11 @@ RLS. En producción el código se elimina en el build.
 
 ## Estado
 
-- Fases 01–06 ✓. `src/features/examenes/` (CRUD + generador de plan en `generador.ts`,
-  pura). `src/features/panel/PaginaHoy.tsx` compone hooks de agenda/examenes/
-  disponibilidad para el panel. Ficha del alumno = 5 pestañas.
-- Siguiente: **Fase 07 — Planificador inteligente, recordatorios/push y estadísticas**.
+- Fases 01–07 ✓.
+  - `src/features/planificador/motor.ts` — puro, sin efectos. Scoring + huecos libres.
+  - `src/features/recordatorios/` — reglas en `perfil.preferencias`,
+    `app.generar_recordatorios()` + pg_cron, avisos in-app (`Avisos.tsx` en Hoy).
+    `push_subscription` existe pero Web Push (SW + Edge Function + VAPID) es Fase 08.
+  - `src/features/estadisticas/` — barras simples (div), sin librería de charts.
+- Siguiente: **Fase 08 — Cierre**: Web Push real, cascarón offline PWA,
+  export/import JSON, accesibilidad, code-splitting, pulido.
