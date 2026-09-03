@@ -5,6 +5,7 @@ import { RutaProtegida } from '@/components/RutaProtegida'
 import { AppLayout } from '@/components/AppLayout'
 import { Cargando } from '@/components/ui'
 import { Acceso } from '@/pages/Acceso'
+import { NuevaContrasena } from '@/pages/NuevaContrasena'
 
 const PaginaHoy = lazy(() =>
   import('@/features/panel/PaginaHoy').then((m) => ({ default: m.PaginaHoy })),
@@ -64,6 +65,7 @@ export default function App() {
         <Suspense fallback={<Cargando />}>
           <Routes>
             <Route path="/acceso" element={<Acceso />} />
+            <Route path="/nueva-contrasena" element={<NuevaContrasena />} />
 
             <Route
               element={

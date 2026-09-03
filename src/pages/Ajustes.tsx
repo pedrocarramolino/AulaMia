@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CabeceraPagina, Tarjeta } from '@/components/ui'
-import { Select } from '@/components/campos'
+import { Select, Input } from '@/components/campos'
+import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/auth/AuthProvider'
 import { useTema, type Tema } from '@/lib/tema'
 import {
@@ -14,6 +16,89 @@ import { CopiasSeguridad } from '@/features/copias/CopiasSeguridad'
 import { NotificacionesPush } from '@/features/copias/NotificacionesPush'
 
 const DIAS_EXAMEN = [1, 3, 7, 14]
+
+function CambiarContrasena() {
+  const [p1, setP1] = useState('')
+  const [p2, setP2] = useState('')
+  const [abierto, setAbierto] = useState(false)
+  const [estado, setEstado] = useState<'idle' | 'guardando' | 'hecho'>('idle')
+  const [error, setError] = useState('')
+
+  async function guardar(e: React.FormEvent) {
+    e.preventDefault()
+    if (p1.length < 8) return setError('Mínimo 8 caracteres.')
+    if (p1 !== p2) return setError('No coinciden.')
+    setError('')
+    setEstado('guardando')
+    const { error } = await supabase.auth.updateUser({ password: p1 })
+    if (error) {
+      setEstado('idle')
+      setError(error.message)
+    } else {
+      setEstado('hecho')
+      setP1('')
+      setP2('')
+      setTimeout(() => {
+        setEstado('idle')
+        setAbierto(false)
+      }, 2000)
+    }
+  }
+
+  if (!abierto) {
+    return (
+      <button
+        onClick={() => setAbierto(true)}
+        className="mt-3 text-sm font-medium text-accent-ink hover:underline"
+      >
+        Cambiar contraseña
+      </button>
+    )
+  }
+
+  return (
+    <form onSubmit={guardar} className="mt-4 flex flex-col gap-3 border-t border-line pt-4">
+      <Input
+        type="password"
+        placeholder="Nueva contraseña (mín. 8)"
+        autoComplete="new-password"
+        minLength={8}
+        value={p1}
+        onChange={(e) => setP1(e.target.value)}
+        required
+      />
+      <Input
+        type="password"
+        placeholder="Repite la contraseña"
+        autoComplete="new-password"
+        value={p2}
+        onChange={(e) => setP2(e.target.value)}
+        required
+      />
+      {error && <p className="text-xs text-crit">{error}</p>}
+      {estado === 'hecho' && <p className="text-xs text-good">Contraseña actualizada.</p>}
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={estado === 'guardando'}
+          className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
+        >
+          {estado === 'guardando' ? 'Guardando…' : 'Guardar'}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setAbierto(false)
+            setError('')
+          }}
+          className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-muted"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  )
+}
 
 function ConfigRecordatorios() {
   const { data: pref } = usePreferencias()
@@ -147,6 +232,7 @@ export function Ajustes() {
               <dd className="text-ink">Español · DD/MM/AAAA · semana en lunes</dd>
             </div>
           </dl>
+          <CambiarContrasena />
         </Tarjeta>
 
         <CopiasSeguridad />
