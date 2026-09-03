@@ -31,10 +31,14 @@ export function Acceso() {
     <div className="flex min-h-dvh items-center justify-center bg-ground px-5">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <span className="font-display text-3xl font-bold tracking-tight text-ink">
-            Aula<span className="text-accent-ink">Mia</span>
-          </span>
-          <p className="mt-2 text-sm text-muted">
+          <img
+            src="/pwa-512.png"
+            alt="AulaMia"
+            width={120}
+            height={120}
+            className="mx-auto rounded-3xl shadow-sm"
+          />
+          <p className="mt-3 text-sm text-muted">
             Agenda y planificador de clases de repaso
           </p>
         </div>

@@ -11,21 +11,21 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'push-sw.js'],
+      includeAssets: ['favicon.png', 'apple-touch-icon.png', 'push-sw.js'],
       manifest: {
         name: 'AulaMia',
         short_name: 'AulaMia',
         description: 'Agenda y planificador inteligente de clases de repaso',
         lang: 'es',
         dir: 'ltr',
-        theme_color: '#4353c4',
-        background_color: '#f4f5f8',
+        theme_color: '#0d7d8c',
+        background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',
         scope: '/',
         icons: [
-          { src: 'favicon.svg', sizes: 'any', type: 'image/svg+xml' },
-          { src: 'pwa-icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' },
+          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },
         ],
       },
       workbox: {
