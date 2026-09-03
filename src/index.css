@@ -124,6 +124,16 @@
     font: inherit;
   }
 
+  /* Tailwind v4 ya no lo pone: cursor de mano en lo interactivo (escritorio) */
+  button:not(:disabled),
+  a[href],
+  [role='button']:not([aria-disabled='true']),
+  input[type='checkbox'],
+  input[type='radio'],
+  summary {
+    cursor: pointer;
+  }
+
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;

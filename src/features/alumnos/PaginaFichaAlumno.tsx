@@ -84,7 +84,7 @@ export function PaginaFichaAlumno() {
             key={p}
             onClick={() => setPestana(p)}
             className={[
-              '-mb-px shrink-0 border-b-2 px-3 py-2 text-sm font-medium capitalize transition-colors',
+              '-mb-px flex shrink-0 items-center border-b-2 px-3.5 py-3 text-sm font-medium capitalize transition-colors',
               pestana === p
                 ? 'border-accent text-ink'
                 : 'border-transparent text-muted hover:text-ink',
@@ -118,9 +118,6 @@ export function PaginaFichaAlumno() {
         {pestana === 'historial' && <HistorialAlumno alumnoId={alumno.id} />}
       </div>
 
-      <p className="mt-8 text-center font-mono text-xs text-muted">
-        Las estadísticas llegan en la Fase 07
-      </p>
     </>
   )
 }

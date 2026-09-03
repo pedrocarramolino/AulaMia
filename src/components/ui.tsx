@@ -121,8 +121,8 @@ export function Boton({
   return (
     <button
       className={[
-        'inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5',
-        'text-sm font-semibold transition-[filter,background-color] disabled:opacity-50',
+        'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5',
+        'text-sm font-semibold transition-[filter,background-color] duration-150 disabled:opacity-50',
         VARIANTES[variante],
         className,
       ].join(' ')}
@@ -152,7 +152,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/50 p-4 sm:items-center"
       onClick={onCerrar}
       role="presentation"
     >
@@ -198,7 +198,7 @@ export function ConfirmarDialogo({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/50 p-4 sm:items-center"
       onClick={onCancelar}
       role="presentation"
     >

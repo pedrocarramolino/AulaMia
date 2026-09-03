@@ -44,7 +44,7 @@ function Fila({
         <button
           type="button"
           onClick={() => setConfirmar(true)}
-          className="text-xs font-medium text-crit hover:underline"
+          className="-m-1.5 inline-flex items-center p-1.5 text-xs font-medium text-crit hover:underline"
         >
           Quitar
         </button>
