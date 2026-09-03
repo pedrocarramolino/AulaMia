@@ -111,15 +111,19 @@ const VARIANTES: Record<Variante, string> = {
   fantasma: 'text-accent-ink hover:bg-accent-soft',
 }
 
-/** Botón. `variante` por defecto: primario. */
+/** Botón. `variante` por defecto: primario. `cargando` muestra un spinner y deshabilita. */
 export function Boton({
   children,
   className = '',
   variante = 'primario',
+  cargando = false,
+  disabled,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variante?: Variante }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variante?: Variante; cargando?: boolean }) {
   return (
     <button
+      disabled={disabled || cargando}
+      aria-busy={cargando || undefined}
       className={[
         'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5',
         'text-sm font-semibold transition-[filter,background-color] duration-150 disabled:opacity-50',
@@ -128,6 +132,9 @@ export function Boton({
       ].join(' ')}
       {...props}
     >
+      {cargando && (
+        <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      )}
       {children}
     </button>
   )

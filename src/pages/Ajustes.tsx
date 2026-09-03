@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CabeceraPagina, Tarjeta } from '@/components/ui'
+import { CabeceraPagina, Tarjeta, Boton } from '@/components/ui'
 import { Select, Input } from '@/components/campos'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/auth/AuthProvider'
@@ -75,26 +75,23 @@ function CambiarContrasena() {
         onChange={(e) => setP2(e.target.value)}
         required
       />
-      {error && <p className="text-xs text-crit">{error}</p>}
+      {error && <p role="alert" className="text-xs text-crit">{error}</p>}
       {estado === 'hecho' && <p className="text-xs text-good">Contraseña actualizada.</p>}
       <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={estado === 'guardando'}
-          className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
-        >
-          {estado === 'guardando' ? 'Guardando…' : 'Guardar'}
-        </button>
-        <button
+        <Boton type="submit" cargando={estado === 'guardando'} className="px-3 py-1.5 text-sm">
+          Guardar
+        </Boton>
+        <Boton
           type="button"
+          variante="secundario"
+          className="px-3 py-1.5 text-sm"
           onClick={() => {
             setAbierto(false)
             setError('')
           }}
-          className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-muted"
         >
           Cancelar
-        </button>
+        </Boton>
       </div>
     </form>
   )

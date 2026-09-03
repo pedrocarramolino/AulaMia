@@ -21,6 +21,27 @@ function Base({ children, ...props }: Props & { children: ReactNode }) {
   )
 }
 
+export const IconoSobre = (p: Props) => (
+  <Base {...p}>
+    <rect x="3" y="5" width="18" height="14" rx="2.5" />
+    <path d="m4 7 8 6 8-6" />
+  </Base>
+)
+
+export const IconoOjo = (p: Props) => (
+  <Base {...p}>
+    <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+    <circle cx="12" cy="12" r="3" />
+  </Base>
+)
+
+export const IconoOjoTachado = (p: Props) => (
+  <Base {...p}>
+    <path d="M9.9 5.7A9.8 9.8 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3.3 3.9M6.3 6.8A17 17 0 0 0 2.5 12S6 18.5 12 18.5a9.4 9.4 0 0 0 4.1-.9" />
+    <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18" />
+  </Base>
+)
+
 export const IconoHoy = (p: Props) => (
   <Base {...p}>
     <circle cx="12" cy="12" r="4" />
