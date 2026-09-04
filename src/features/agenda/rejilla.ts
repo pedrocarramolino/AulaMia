@@ -16,7 +16,7 @@ const H = 60
 export function calcularRejilla(
   clases: Pick<ClaseAgenda, 'hora_inicio' | 'hora_fin'>[],
   pxHora: number,
-  porDefecto: [number, number] = [9, 21],
+  porDefecto: [number, number] = [9, 22],
 ): RejillaConfig {
   let min = porDefecto[0] * H
   let max = porDefecto[1] * H
