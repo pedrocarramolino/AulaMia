@@ -111,7 +111,7 @@ export function PaginaAgenda() {
       </div>
 
       {/* Navegación de fecha */}
-      <div className="mb-3 flex items-center gap-2">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
         <button
           onClick={() => navegar(-1)}
           aria-label="Anterior"
@@ -132,7 +132,6 @@ export function PaginaAgenda() {
         >
           Hoy
         </button>
-        <p className="ml-1 truncate text-sm font-semibold text-ink">{titulo}</p>
         <button
           onClick={() => setFiltrosAbiertos((v) => !v)}
           className={`ml-auto rounded-lg border px-3 py-1.5 text-sm font-medium ${
@@ -143,6 +142,9 @@ export function PaginaAgenda() {
         >
           Filtros
         </button>
+        <p className="order-last w-full text-sm font-semibold text-ink sm:order-none sm:ml-1 sm:w-auto sm:min-w-0 sm:flex-1 sm:truncate">
+          {titulo}
+        </p>
       </div>
 
       {filtrosAbiertos && (
