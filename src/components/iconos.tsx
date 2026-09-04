@@ -21,6 +21,12 @@ function Base({ children, ...props }: Props & { children: ReactNode }) {
   )
 }
 
+export const IconoX = (p: Props) => (
+  <Base {...p}>
+    <path d="M6 6l12 12M18 6L6 18" />
+  </Base>
+)
+
 export const IconoSobre = (p: Props) => (
   <Base {...p}>
     <rect x="3" y="5" width="18" height="14" rx="2.5" />

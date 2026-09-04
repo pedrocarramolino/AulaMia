@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { addDays } from 'date-fns'
-import { CabeceraPagina, Boton, Tarjeta } from '@/components/ui'
+import { CabeceraPagina, Boton, Tarjeta, ConfirmarDialogo } from '@/components/ui'
 import { Input, Select } from '@/components/campos'
-import { IconoFlechaIzq, IconoMas1 } from '@/components/iconos'
+import { IconoFlechaIzq, IconoMas1, IconoX } from '@/components/iconos'
 import { DIAS_SEMANA, franja, aMinutos, fechaCorta, aISO, deISO } from '@/lib/fechas'
 import {
   useDisponibilidad,
@@ -124,7 +124,7 @@ function FilaDia({
           <button
             type="button"
             onClick={onCopiarLaborables}
-            className="-m-1.5 inline-flex items-center p-1.5 text-xs font-medium text-accent-ink hover:underline"
+            className="-m-2 inline-flex min-h-9 items-center p-2 text-xs font-medium text-accent-ink hover:underline"
           >
             Copiar a L–V
           </button>
@@ -138,16 +138,16 @@ function FilaDia({
         {tramos.map((t) => (
           <span
             key={t.id}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-accent-soft py-1 pl-2.5 pr-1 text-sm font-medium text-accent-ink"
+            className="inline-flex items-center gap-1 rounded-lg bg-accent-soft py-1 pl-2.5 pr-1 text-sm font-medium text-accent-ink"
           >
             {franja(t.hora_inicio, t.hora_fin)}
             <button
               type="button"
               aria-label="Quitar tramo"
               onClick={() => eliminar.mutate(t.id)}
-              className="grid size-5 place-items-center rounded-md text-accent-ink/70 hover:bg-surface hover:text-crit"
+              className="grid size-8 place-items-center rounded-md text-accent-ink/70 hover:bg-surface hover:text-crit"
             >
-              ✕
+              <IconoX className="size-3.5" />
             </button>
           </span>
         ))}
@@ -167,7 +167,7 @@ function FilaDia({
               onChange={(e) => setFin(e.target.value)}
               style={{ width: '7rem' }}
             />
-            <Boton type="submit" className="px-3 py-1.5">
+            <Boton type="submit" className="px-3 py-1.5" cargando={crear.isPending}>
               Añadir
             </Boton>
             <Boton
@@ -192,7 +192,11 @@ function FilaDia({
           </button>
         )}
       </div>
-      {error && <p className="text-xs text-crit">{error}</p>}
+      {error && (
+        <p role="alert" className="text-xs text-crit">
+          {error}
+        </p>
+      )}
     </div>
   )
 }
@@ -211,6 +215,7 @@ function DiasEspeciales() {
   const [fin, setFin] = useState('20:00')
   const [motivo, setMotivo] = useState('')
   const [error, setError] = useState('')
+  const [aBorrar, setABorrar] = useState<GrupoExcepcion | null>(null)
 
   const grupos = agruparExcepciones(excepciones ?? [])
 
@@ -283,8 +288,8 @@ function DiasEspeciales() {
               </div>
               <button
                 type="button"
-                onClick={() => eliminar.mutate(g.ids)}
-                className="-m-1.5 inline-flex items-center p-1.5 text-xs font-medium text-crit hover:underline"
+                onClick={() => setABorrar(g)}
+                className="-m-2 inline-flex min-h-9 items-center p-2 text-xs font-medium text-crit hover:underline"
               >
                 Quitar
               </button>
@@ -294,6 +299,29 @@ function DiasEspeciales() {
       ) : (
         <p className="mt-4 text-sm text-muted">No hay días especiales próximos.</p>
       )}
+
+      <ConfirmarDialogo
+        abierto={aBorrar != null}
+        titulo={
+          aBorrar && aBorrar.ids.length > 1
+            ? `¿Quitar estos ${aBorrar.ids.length} días?`
+            : '¿Quitar este día especial?'
+        }
+        texto={
+          aBorrar
+            ? aBorrar.fechaDesde === aBorrar.fechaHasta
+              ? fechaCorta(aBorrar.fechaDesde)
+              : `Del ${fechaCorta(aBorrar.fechaDesde)} al ${fechaCorta(aBorrar.fechaHasta)}.`
+            : undefined
+        }
+        confirmar="Quitar"
+        peligro
+        onCancelar={() => setABorrar(null)}
+        onConfirmar={() => {
+          if (aBorrar) eliminar.mutate(aBorrar.ids)
+          setABorrar(null)
+        }}
+      />
 
       {abierto ? (
         <form onSubmit={anadir} className="mt-4 flex flex-col gap-3 rounded-xl bg-surface-2 p-4">
@@ -347,7 +375,11 @@ function DiasEspeciales() {
             onChange={(e) => setMotivo(e.target.value)}
             placeholder="Motivo (opcional)"
           />
-          {error && <p className="text-xs text-crit">{error}</p>}
+          {error && (
+            <p role="alert" className="text-xs text-crit">
+              {error}
+            </p>
+          )}
           <div className="flex gap-2">
             <Boton type="submit" cargando={crear.isPending}>Guardar</Boton>
             <Boton type="button" variante="secundario" onClick={() => setAbierto(false)}>
