@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { CabeceraPagina, Boton, Cargando } from '@/components/ui'
-import { Campo, Input, Select, Textarea } from '@/components/campos'
+import { Campo, Input, Select, Textarea, InputFecha } from '@/components/campos'
 import { IconoFlechaIzq } from '@/components/iconos'
 import { useAlumnos } from '@/features/alumnos/api'
 import { useMaterias } from '@/features/materias/api'
@@ -133,11 +133,10 @@ export function EditorExamen() {
             />
           </Campo>
           <Campo etiqueta="Fecha del examen" obligatorio>
-            <Input
-              type="date"
+            <InputFecha
               value={c.fecha}
               min={new Date().toISOString().slice(0, 10)}
-              onChange={(e) => set('fecha', e.target.value)}
+              onChange={(v) => set('fecha', v)}
               required
             />
           </Campo>

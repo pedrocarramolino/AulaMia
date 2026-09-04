@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { CabeceraPagina, Boton, Cargando, ConfirmarDialogo } from '@/components/ui'
-import { Campo, Input, Textarea } from '@/components/campos'
+import { Campo, Input, Textarea, InputFecha } from '@/components/campos'
 import { IconoFlechaIzq } from '@/components/iconos'
 import { COLOR_ALUMNO_POR_DEFECTO } from '@/lib/colores'
 import {
@@ -153,12 +153,11 @@ export function PaginaEditorAlumno() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           <Campo etiqueta="Fecha de nacimiento" htmlFor="nacimiento" ayuda="La edad se calcula sola.">
-            <Input
+            <InputFecha
               id="nacimiento"
-              type="date"
               value={form.fecha_nacimiento}
               max={new Date().toISOString().slice(0, 10)}
-              onChange={(e) => set('fecha_nacimiento', e.target.value)}
+              onChange={(v) => set('fecha_nacimiento', v)}
             />
           </Campo>
           <Campo etiqueta="Curso escolar" htmlFor="curso">

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { addDays } from 'date-fns'
 import { CabeceraPagina, Boton, Tarjeta, ConfirmarDialogo } from '@/components/ui'
-import { Input, Select } from '@/components/campos'
+import { Input, Select, InputFecha } from '@/components/campos'
 import { IconoFlechaIzq, IconoMas1, IconoX } from '@/components/iconos'
 import { DIAS_SEMANA, franja, aMinutos, fechaCorta, aISO, deISO } from '@/lib/fechas'
 import {
@@ -328,21 +328,19 @@ function DiasEspeciales() {
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="flex flex-col gap-1 text-xs font-medium text-muted">
               Desde
-              <Input
-                type="date"
+              <InputFecha
                 value={desde}
                 min={new Date().toISOString().slice(0, 10)}
-                onChange={(e) => setDesde(e.target.value)}
+                onChange={setDesde}
                 required
               />
             </label>
             <label className="flex flex-col gap-1 text-xs font-medium text-muted">
               Hasta (opcional)
-              <Input
-                type="date"
+              <InputFecha
                 value={hasta}
                 min={desde || new Date().toISOString().slice(0, 10)}
-                onChange={(e) => setHasta(e.target.value)}
+                onChange={setHasta}
                 placeholder="Mismo día"
               />
             </label>

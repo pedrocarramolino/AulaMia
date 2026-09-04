@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { CabeceraPagina, Boton, Cargando } from '@/components/ui'
-import { Campo, Input, Select } from '@/components/campos'
+import { Campo, Input, Select, InputFecha } from '@/components/campos'
 import { IconoFlechaIzq } from '@/components/iconos'
 import { DURACIONES, duracionLegible, hora, sumarMinutos, aMinutos, aISO } from '@/lib/fechas'
 import { addDays } from 'date-fns'
@@ -140,7 +140,7 @@ export function EditorClase() {
           <>
             <div className="grid gap-5 sm:grid-cols-2">
               <Campo etiqueta="Fecha" obligatorio>
-                <Input type="date" value={c.fecha} onChange={(e) => set('fecha', e.target.value)} required />
+                <InputFecha value={c.fecha} onChange={(v) => set('fecha', v)} required />
               </Campo>
               <Campo etiqueta="Hora de inicio" obligatorio>
                 <Input

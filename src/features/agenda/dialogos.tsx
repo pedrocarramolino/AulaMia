@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Modal, Boton } from '@/components/ui'
-import { Input, Select, Textarea } from '@/components/campos'
+import { Input, Select, Textarea, InputFecha } from '@/components/campos'
 import {
   DURACIONES,
   duracionLegible,
@@ -206,7 +206,7 @@ export function MoverDialogo({
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-1 text-xs font-medium text-muted">
             Fecha
-            <Input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+            <InputFecha value={fecha} onChange={setFecha} />
           </label>
           <label className="flex flex-col gap-1 text-xs font-medium text-muted">
             Hora
@@ -303,11 +303,10 @@ export function RecuperarDialogo({
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-1 text-xs font-medium text-muted">
             Fecha
-            <Input
-              type="date"
+            <InputFecha
               value={fecha}
               min={new Date().toISOString().slice(0, 10)}
-              onChange={(e) => setFecha(e.target.value)}
+              onChange={setFecha}
             />
           </label>
           <label className="flex flex-col gap-1 text-xs font-medium text-muted">

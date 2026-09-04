@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Cargando, EstadoVacio, Boton, ConfirmarDialogo, Tarjeta } from '@/components/ui'
-import { Input } from '@/components/campos'
+import { Input, InputFecha } from '@/components/campos'
 import { IconoFlechaIzq, IconoMas1 } from '@/components/iconos'
 import { fechaCorta, fechaLarga } from '@/lib/fechas'
 import { AvatarAlumno } from '@/features/alumnos/componentes'
@@ -201,11 +201,10 @@ export function PaginaExamen() {
         )}
 
         <form onSubmit={anadirPaso} className="mt-3 flex gap-2">
-          <Input
-            type="date"
+          <InputFecha
             value={nuevoPaso.fecha}
-            onChange={(e) => setNuevoPaso((p) => ({ ...p, fecha: e.target.value }))}
-            style={{ width: '9rem' }}
+            onChange={(v) => setNuevoPaso((p) => ({ ...p, fecha: v }))}
+            className="w-36 shrink-0"
           />
           <Input
             value={nuevoPaso.descripcion}

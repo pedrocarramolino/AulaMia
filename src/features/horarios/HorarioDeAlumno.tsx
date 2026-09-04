@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Boton, ConfirmarDialogo } from '@/components/ui'
-import { Input, Select } from '@/components/campos'
+import { Input, Select, InputFecha } from '@/components/campos'
 import { IconoMas1, IconoAgenda } from '@/components/iconos'
 import {
   DIAS_SEMANA,
@@ -174,15 +174,14 @@ function FormularioHorario({
         </label>
         <label className="flex flex-col gap-1 text-xs font-medium text-muted">
           Desde
-          <Input type="date" value={c.vigente_desde} onChange={(e) => set('vigente_desde', e.target.value)} />
+          <InputFecha value={c.vigente_desde} onChange={(v) => set('vigente_desde', v)} />
         </label>
         <label className="flex flex-col gap-1 text-xs font-medium text-muted">
           Hasta (opcional)
-          <Input
-            type="date"
+          <InputFecha
             value={c.vigente_hasta}
             min={c.vigente_desde}
-            onChange={(e) => set('vigente_hasta', e.target.value)}
+            onChange={(v) => set('vigente_hasta', v)}
           />
         </label>
         <label className="flex flex-col gap-1 text-xs font-medium text-muted">
