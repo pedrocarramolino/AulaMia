@@ -9,7 +9,7 @@ export function AuthLayout({
   subtitulo?: string
 }) {
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-ground px-5 py-10">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-ground px-5 pb-10 pt-[calc(env(safe-area-inset-top)+2.5rem)]">
       <div className="w-full max-w-sm">
         <div className="mb-7 flex flex-col items-center text-center">
           <img

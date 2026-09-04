@@ -154,10 +154,13 @@
   }
 }
 
-/* Área segura (notch / barra de gestos) para la navegación inferior en móvil */
+/* Área segura (notch / barra de gestos / barra de estado) en móvil */
 @utility pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }
 @utility h-safe-bottom {
   height: env(safe-area-inset-bottom);
+}
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
 }

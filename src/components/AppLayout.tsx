@@ -24,7 +24,7 @@ export function AppLayout() {
   useGenerarRecordatoriosAlEntrar()
 
   return (
-    <div className="min-h-dvh md:grid md:grid-cols-[15rem_1fr]">
+    <div className="min-h-dvh pt-safe md:grid md:grid-cols-[15rem_1fr]">
       {/* Barra lateral — escritorio */}
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-surface px-3 py-5 md:flex">
         <div className="px-3 pb-6">
