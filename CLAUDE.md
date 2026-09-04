@@ -52,8 +52,9 @@ RLS. En producción el código se elimina en el build.
   un horario, borra las clases futuras `programada` y `not modificada` de esa serie
   y regenera. No toca las pasadas ni las modificadas.
 - `pg_cron` job `generar-clases-diario` (03:15) regenera para todos los usuarios.
-- El solape de clases lo impide la constraint `clase_sin_solape` (SQLSTATE 23P01);
-  hay que traducirlo a mensaje amable en la UI (pendiente para Fase 04).
+- Las clases pueden solaparse a propósito (el profesor da clase a varios alumnos
+  a la misma hora): no hay constraint de solape ni en la BD ni en el motor.
+  La rejilla de la Agenda (`carriles()` en `rejilla.ts`) las reparte lado a lado.
 
 ## Agenda (Fase 04)
 

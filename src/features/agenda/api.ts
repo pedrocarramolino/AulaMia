@@ -28,11 +28,8 @@ const SELECT =
 
 /** Traduce errores de Postgres a mensajes para la profesora. */
 export function mensajeErrorClase(error: unknown): string {
-  const e = error as { code?: string; message?: string }
+  const e = error as { message?: string }
   const msg = e?.message ?? ''
-  if (e?.code === '23P01' || msg.includes('clase_sin_solape')) {
-    return 'Ya tienes otra clase en esa franja horaria.'
-  }
   if (msg.includes('disponibilidad')) return 'Esa hora queda fuera de tu disponibilidad.'
   return 'No se ha podido guardar el cambio. Inténtalo de nuevo.'
 }
