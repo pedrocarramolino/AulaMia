@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
+import type { ComponentType, SVGProps } from 'react'
 import { relativo } from '@/lib/fechas'
+import { IconoReloj, IconoExamenes, IconoDeshacer, IconoAviso } from '@/components/iconos'
 import {
   useRecordatoriosActivos,
   useMarcarVisto,
@@ -7,11 +9,11 @@ import {
   type Recordatorio,
 } from './api'
 
-const ICONO: Record<Recordatorio['tipo'], string> = {
-  clase: '🕑',
-  examen: '📝',
-  recuperacion: '↩️',
-  inactividad: '⚠️',
+const ICONO: Record<Recordatorio['tipo'], ComponentType<SVGProps<SVGSVGElement>>> = {
+  clase: IconoReloj,
+  examen: IconoExamenes,
+  recuperacion: IconoDeshacer,
+  inactividad: IconoAviso,
 }
 
 function destino(r: Recordatorio): string {
@@ -43,14 +45,14 @@ export function Avisos() {
         )}
       </div>
       <div className="flex flex-col gap-2">
-        {avisos.map((a) => (
+        {avisos.map((a) => {
+          const Icono = ICONO[a.tipo]
+          return (
           <div
             key={a.id}
             className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3 py-2.5"
           >
-            <span aria-hidden className="text-lg">
-              {ICONO[a.tipo]}
-            </span>
+            <Icono aria-hidden className="size-5 shrink-0 text-muted" />
             <button
               onClick={() => navigate(destino(a))}
               className="min-w-0 flex-1 text-left"
@@ -66,7 +68,8 @@ export function Avisos() {
               Visto
             </button>
           </div>
-        ))}
+          )
+        })}
       </div>
     </section>
   )

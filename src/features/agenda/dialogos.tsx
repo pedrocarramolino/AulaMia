@@ -126,7 +126,7 @@ export function CancelarDialogo({
           </p>
         )}
 
-        {error && <p className="text-sm text-crit">{error}</p>}
+        {error && <p role="alert" className="text-sm text-crit">{error}</p>}
 
         <div className="mt-1 flex gap-2">
           <Boton variante="secundario" className="flex-1" onClick={onCerrar}>
@@ -136,7 +136,7 @@ export function CancelarDialogo({
             variante="peligro"
             className="flex-1"
             onClick={confirmar}
-            disabled={cancelar.isPending || desactivarHorario.isPending}
+            cargando={cancelar.isPending || desactivarHorario.isPending}
           >
             {recurrente && scope === 'serie' ? 'Pausar horario' : 'Cancelar clase'}
           </Boton>
@@ -236,7 +236,7 @@ export function MoverDialogo({
           </label>
         )}
 
-        {error && <p className="text-sm text-crit">{error}</p>}
+        {error && <p role="alert" className="text-sm text-crit">{error}</p>}
 
         <div className="mt-1 flex gap-2">
           <Boton variante="secundario" className="flex-1" onClick={onCerrar}>
@@ -245,7 +245,7 @@ export function MoverDialogo({
           <Boton
             className="flex-1"
             onClick={confirmar}
-            disabled={mover.isPending || actualizarHorario.isPending}
+            cargando={mover.isPending || actualizarHorario.isPending}
           >
             Guardar
           </Boton>
@@ -325,13 +325,13 @@ export function RecuperarDialogo({
           </Select>
         </label>
 
-        {error && <p className="text-sm text-crit">{error}</p>}
+        {error && <p role="alert" className="text-sm text-crit">{error}</p>}
 
         <div className="mt-1 flex gap-2">
           <Boton variante="secundario" className="flex-1" onClick={onCerrar}>
             Volver
           </Boton>
-          <Boton className="flex-1" onClick={confirmar} disabled={recuperar.isPending}>
+          <Boton className="flex-1" onClick={confirmar} cargando={recuperar.isPending}>
             Crear recuperación
           </Boton>
         </div>

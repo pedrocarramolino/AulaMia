@@ -129,12 +129,12 @@ export function PaginaPlanificador() {
             <button
               onClick={anadirTodas}
               disabled={crear.isPending}
-              className="text-sm font-semibold text-accent-ink hover:underline"
+              className="text-sm font-semibold text-accent-ink hover:underline disabled:opacity-50"
             >
-              Añadir todas
+              {crear.isPending ? 'Añadiendo…' : 'Añadir todas'}
             </button>
           </div>
-          {error && <p className="mb-3 text-sm text-crit">{error}</p>}
+          {error && <p role="alert" className="mb-3 text-sm text-crit">{error}</p>}
           <div className="flex flex-col gap-3">
             {visibles.map((s) => (
               <Tarjeta

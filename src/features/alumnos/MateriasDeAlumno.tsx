@@ -44,7 +44,7 @@ function Fila({
         <button
           type="button"
           onClick={() => setConfirmar(true)}
-          className="-m-1.5 inline-flex items-center p-1.5 text-xs font-medium text-crit hover:underline"
+          className="-m-2 inline-flex min-h-9 items-center p-2 text-xs font-medium text-crit hover:underline"
         >
           Quitar
         </button>
@@ -171,12 +171,16 @@ export function MateriasDeAlumno({ alumnoId }: { alumnoId: string }) {
               <option key={m.id} value={m.nombre} />
             ))}
           </datalist>
-          {error && <p className="mt-2 text-xs text-crit">{error}</p>}
+          {error && (
+            <p role="alert" className="mt-2 text-xs text-crit">
+              {error}
+            </p>
+          )}
           <p className="mt-2 text-xs text-muted">
             Si la materia no existe, se crea en el catálogo automáticamente.
           </p>
           <div className="mt-3 flex gap-2">
-            <Boton type="submit" disabled={asignar.isPending || crearMateria.isPending}>
+            <Boton type="submit" cargando={asignar.isPending || crearMateria.isPending}>
               Añadir
             </Boton>
             <Boton

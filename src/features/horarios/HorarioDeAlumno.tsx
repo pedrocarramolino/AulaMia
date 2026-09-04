@@ -198,7 +198,7 @@ function FormularioHorario({
         </label>
       </div>
 
-      {error && <p className="text-xs text-crit">{error}</p>}
+      {error && <p role="alert" className="text-xs text-crit">{error}</p>}
 
       <div className="flex gap-2">
         <Boton type="submit" disabled={guardando}>
@@ -289,14 +289,14 @@ function FilaHorario({ alumnoId, horario }: { alumnoId: string; horario: Horario
         <button
           type="button"
           onClick={() => actualizar.mutate({ id: horario.id, cambios: { activo: !horario.activo } })}
-          className="-my-1 py-1 text-muted hover:text-ink"
+          className="-my-1.5 inline-flex min-h-9 items-center py-1.5 text-muted hover:text-ink"
         >
           {horario.activo ? 'Pausar' : 'Reanudar'}
         </button>
         <button
           type="button"
           onClick={() => setConfirmar(true)}
-          className="-my-1 py-1 text-crit hover:underline"
+          className="-my-1.5 inline-flex min-h-9 items-center py-1.5 text-crit hover:underline"
         >
           Eliminar
         </button>

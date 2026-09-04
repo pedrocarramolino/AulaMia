@@ -28,22 +28,23 @@ function PuntoColor({
         type="button"
         aria-label="Cambiar color"
         onClick={() => setAbierto((v) => !v)}
-        className="size-5 rounded-full ring-1 ring-line-strong"
+        className="size-7 rounded-full ring-1 ring-line-strong"
         style={{ backgroundColor: color ?? 'var(--muted)' }}
       />
       {abierto && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setAbierto(false)} />
-          <div className="absolute left-0 top-7 z-20 grid w-40 grid-cols-6 gap-1.5 rounded-xl border border-line bg-surface p-2 shadow-lg">
+          <div className="absolute left-0 top-9 z-20 grid w-48 grid-cols-6 gap-2 rounded-xl border border-line bg-surface p-2.5 shadow-lg">
             {COLORES_MATERIA.map((c) => (
               <button
                 key={c}
                 type="button"
+                aria-label={c}
                 onClick={() => {
                   onChange(c)
                   setAbierto(false)
                 }}
-                className="size-5 rounded-full hover:scale-110"
+                className="size-6 rounded-full hover:scale-110"
                 style={{ backgroundColor: c }}
               />
             ))}
@@ -85,7 +86,7 @@ function Fila({ materia }: { materia: Materia }) {
       <button
         type="button"
         onClick={() => setConfirmar(true)}
-        className="-m-1.5 inline-flex items-center p-1.5 text-xs font-medium text-crit hover:underline"
+        className="-m-2 inline-flex min-h-9 items-center p-2 text-xs font-medium text-crit hover:underline"
       >
         Eliminar
       </button>
@@ -150,12 +151,16 @@ export function PaginaMaterias() {
           }}
           placeholder="Nueva materia (Matemáticas, Inglés…)"
         />
-        <Boton type="submit" disabled={crear.isPending}>
-          <IconoMas1 className="size-4" />
+        <Boton type="submit" cargando={crear.isPending}>
+          {!crear.isPending && <IconoMas1 className="size-4" />}
           <span className="hidden sm:inline">Añadir</span>
         </Boton>
       </form>
-      {error && <p className="mb-4 text-sm text-crit">{error}</p>}
+      {error && (
+        <p role="alert" className="mb-4 text-sm text-crit">
+          {error}
+        </p>
+      )}
 
       {isLoading ? (
         <div className="h-40 animate-pulse rounded-2xl bg-surface-2" />

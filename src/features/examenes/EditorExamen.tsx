@@ -158,7 +158,7 @@ export function EditorExamen() {
           <NivelPreparacion valor={c.nivel_preparacion} onChange={(v) => set('nivel_preparacion', v)} />
         </Campo>
 
-        {error && <p className="text-sm text-crit">{error}</p>}
+        {error && <p role="alert" className="text-sm text-crit">{error}</p>}
 
         <div className="flex gap-2">
           <Boton type="submit" disabled={guardando}>

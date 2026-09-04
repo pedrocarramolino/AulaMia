@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Input, Select } from '@/components/campos'
 import { Boton } from '@/components/ui'
-import { IconoMas1 } from '@/components/iconos'
+import { IconoMas1, IconoX } from '@/components/iconos'
 import { fechaCorta } from '@/lib/fechas'
 import {
   useTareasDeClase,
@@ -55,9 +55,9 @@ function FilaTarea({
         type="button"
         onClick={() => eliminar.mutate({ id: tarea.id, _ctx: ctx })}
         aria-label="Quitar tarea"
-        className="shrink-0 text-xs font-medium text-crit hover:underline"
+        className="-m-2 grid size-9 shrink-0 place-items-center rounded-md text-muted hover:bg-crit-soft hover:text-crit"
       >
-        ✕
+        <IconoX className="size-3.5" />
       </button>
     </div>
   )
@@ -115,8 +115,8 @@ export function TareasDeClase({
           <option value="deberes">Deberes</option>
           <option value="en_clase">En clase</option>
         </Select>
-        <Boton type="submit" disabled={crear.isPending} className="shrink-0 px-3">
-          <IconoMas1 className="size-4" />
+        <Boton type="submit" cargando={crear.isPending} className="shrink-0 px-3">
+          {!crear.isPending && <IconoMas1 className="size-4" />}
         </Boton>
       </form>
     </section>

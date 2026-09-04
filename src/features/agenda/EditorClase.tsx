@@ -178,7 +178,7 @@ export function EditorClase() {
           />
         </Campo>
 
-        {error && <p className="text-sm text-crit">{error}</p>}
+        {error && <p role="alert" className="text-sm text-crit">{error}</p>}
 
         <div className="flex gap-2">
           <Boton type="submit" disabled={guardando}>

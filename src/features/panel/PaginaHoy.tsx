@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { addDays } from 'date-fns'
 import { CabeceraPagina } from '@/components/ui'
+import { IconoExamenes } from '@/components/iconos'
 import {
   aISO,
   fechaLarga,
@@ -234,10 +235,11 @@ export function PaginaHoy() {
                   <Link
                     key={e.id}
                     to={`/examenes/${e.id}`}
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4"
+                    className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-4"
                   >
-                    <span className="min-w-0 truncate text-sm text-ink">
-                      📝 {e.titulo} · {e.alumno.nombre}
+                    <IconoExamenes className="size-4 shrink-0 text-muted" />
+                    <span className="min-w-0 flex-1 truncate text-sm text-ink">
+                      {e.titulo} · {e.alumno.nombre}
                     </span>
                     <DiasBadge fecha={e.fecha} />
                   </Link>

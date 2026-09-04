@@ -124,7 +124,7 @@ export function CopiasSeguridad() {
         />
       </div>
 
-      {error && <p className="mt-3 text-sm text-crit">{error}</p>}
+      {error && <p role="alert" className="mt-3 text-sm text-crit">{error}</p>}
 
       <ConfirmarDialogo
         abierto={pendiente !== null}

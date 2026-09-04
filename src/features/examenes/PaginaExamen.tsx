@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Cargando, EstadoVacio, Boton, ConfirmarDialogo, Tarjeta } from '@/components/ui'
 import { Input, InputFecha } from '@/components/campos'
-import { IconoFlechaIzq, IconoMas1 } from '@/components/iconos'
+import { IconoFlechaIzq, IconoMas1, IconoX } from '@/components/iconos'
 import { fechaCorta, fechaLarga } from '@/lib/fechas'
 import { AvatarAlumno } from '@/features/alumnos/componentes'
 import { useClasesDeAlumno } from '@/features/agenda/api'
@@ -53,9 +53,9 @@ function Paso({ examenId, paso }: { examenId: string; paso: PasoPlan }) {
         type="button"
         onClick={() => eliminar.mutate(paso.id)}
         aria-label="Quitar paso"
-        className="shrink-0 text-xs font-medium text-crit hover:underline"
+        className="-m-2 grid size-9 shrink-0 place-items-center rounded-md text-muted hover:bg-crit-soft hover:text-crit"
       >
-        ✕
+        <IconoX className="size-3.5" />
       </button>
     </div>
   )
@@ -194,7 +194,7 @@ export function PaginaExamen() {
               Aún no hay plan. Genéralo a partir del temario y de las clases que tienes
               con {examen.alumno.nombre} antes del examen.
             </p>
-            <Boton className="mt-4" onClick={generar} disabled={reemplazar.isPending}>
+            <Boton className="mt-4" onClick={generar} cargando={reemplazar.isPending}>
               Generar plan de repaso
             </Boton>
           </div>
@@ -211,8 +211,8 @@ export function PaginaExamen() {
             onChange={(e) => setNuevoPaso((p) => ({ ...p, descripcion: e.target.value }))}
             placeholder="Añadir un paso a mano"
           />
-          <Boton type="submit" className="shrink-0 px-3" disabled={crearPaso.isPending}>
-            <IconoMas1 className="size-4" />
+          <Boton type="submit" className="shrink-0 px-3" cargando={crearPaso.isPending}>
+            {!crearPaso.isPending && <IconoMas1 className="size-4" />}
           </Boton>
         </form>
       </section>

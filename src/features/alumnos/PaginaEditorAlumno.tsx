@@ -240,7 +240,7 @@ export function PaginaEditorAlumno() {
           <button
             type="button"
             onClick={() => setConfirmarArchivar(true)}
-            className="self-start text-sm font-medium text-crit hover:underline"
+            className="-m-2 -mt-1 inline-flex min-h-9 items-center self-start p-2 text-sm font-medium text-crit hover:underline"
           >
             Archivar alumno
           </button>
@@ -249,7 +249,7 @@ export function PaginaEditorAlumno() {
           <button
             type="button"
             onClick={() => archivar.mutate({ id: id!, activo: true })}
-            className="self-start text-sm font-medium text-accent-ink hover:underline"
+            className="-m-2 -mt-1 inline-flex min-h-9 items-center self-start p-2 text-sm font-medium text-accent-ink hover:underline"
           >
             Reactivar alumno
           </button>

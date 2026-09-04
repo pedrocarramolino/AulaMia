@@ -109,7 +109,7 @@ export function NotificacionesPush() {
           </Boton>
         )}
       </div>
-      {error && <p className="mt-3 text-sm text-crit">{error}</p>}
+      {error && <p role="alert" className="mt-3 text-sm text-crit">{error}</p>}
     </Tarjeta>
   )
 }
