@@ -401,10 +401,13 @@ export function PaginaDisponibilidad() {
         <div className="h-64 animate-pulse rounded-2xl bg-surface-2" />
       ) : (
         <div className="flex flex-col gap-4">
+          <DiasEspeciales />
+
           <Tarjeta>
             <h2 className="font-display text-base font-semibold text-ink">Semana habitual</h2>
+            <p className="mt-1 text-sm text-muted">De lunes a viernes.</p>
             <div className="mt-2">
-              {DIAS_SEMANA.map((nombre, i) => {
+              {DIAS_SEMANA.slice(0, 5).map((nombre, i) => {
                 const dia = i + 1
                 return (
                   <FilaDia
@@ -412,15 +415,13 @@ export function PaginaDisponibilidad() {
                     dia={dia}
                     nombre={nombre}
                     tramos={porDia(dia)}
-                    puedeCopiar={dia <= 5 && porDia(dia).length > 0}
+                    puedeCopiar={porDia(dia).length > 0}
                     onCopiarLaborables={() => copiarLaborables(dia)}
                   />
                 )
               })}
             </div>
           </Tarjeta>
-
-          <DiasEspeciales />
         </div>
       )}
     </>
