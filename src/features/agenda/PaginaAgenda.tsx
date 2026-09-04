@@ -62,7 +62,7 @@ export function PaginaAgenda() {
     }
     if (vista === 'semana') {
       const ini = startOfWeek(fecha, { weekStartsOn: 1 })
-      const fin = endOfWeek(fecha, { weekStartsOn: 1 })
+      const fin = addDays(ini, 4) // viernes: la vista de semana es de lunes a viernes
       const t =
         format(ini, 'd MMM', { locale: es }) + ' – ' + format(fin, 'd MMM yyyy', { locale: es })
       return { desde: aISO(ini), hasta: aISO(fin), titulo: t }

@@ -94,7 +94,9 @@ export function useExcepciones() {
 export function useCrearExcepcion() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (entrada: TablesInsert<'disponibilidad_excepcion'>) => {
+    mutationFn: async (
+      entrada: TablesInsert<'disponibilidad_excepcion'> | TablesInsert<'disponibilidad_excepcion'>[],
+    ) => {
       const { error } = await supabase.from('disponibilidad_excepcion').insert(entrada)
       if (error) throw error
     },
@@ -108,11 +110,11 @@ export function useCrearExcepcion() {
 export function useEliminarExcepcion() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async (id: string | string[]) => {
       const { error } = await supabase
         .from('disponibilidad_excepcion')
         .delete()
-        .eq('id', id)
+        .in('id', Array.isArray(id) ? id : [id])
       if (error) throw error
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: claves.excepciones }),

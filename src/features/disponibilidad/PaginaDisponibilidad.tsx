@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { addDays } from 'date-fns'
 import { CabeceraPagina, Boton, Tarjeta } from '@/components/ui'
 import { Input, Select } from '@/components/campos'
 import { IconoFlechaIzq, IconoMas1 } from '@/components/iconos'
-import { DIAS_SEMANA, franja, aMinutos, fechaCorta } from '@/lib/fechas'
+import { DIAS_SEMANA, franja, aMinutos, fechaCorta, aISO, deISO } from '@/lib/fechas'
 import {
   useDisponibilidad,
   useCrearTramo,
@@ -13,7 +14,62 @@ import {
   useCrearExcepcion,
   useEliminarExcepcion,
   type Tramo,
+  type Excepcion,
 } from './api'
+
+const MAX_DIAS_RANGO = 90
+
+/** Días de fecha1 a fecha2 (ISO), ambos incluidos. */
+function rangoFechas(fecha1: string, fecha2: string): string[] {
+  const dias: string[] = []
+  let d = deISO(fecha1)
+  const fin = deISO(fecha2)
+  while (d <= fin) {
+    dias.push(aISO(d))
+    d = addDays(d, 1)
+  }
+  return dias
+}
+
+interface GrupoExcepcion {
+  ids: string[]
+  fechaDesde: string
+  fechaHasta: string
+  tipo: Excepcion['tipo']
+  hora_inicio: string | null
+  hora_fin: string | null
+  motivo: string | null
+}
+
+/** Agrupa excepciones consecutivas (mismo tipo/horario/motivo) en un solo bloque. */
+function agruparExcepciones(excepciones: Excepcion[]): GrupoExcepcion[] {
+  const grupos: GrupoExcepcion[] = []
+  for (const e of excepciones) {
+    const anterior = grupos.at(-1)
+    const siguiente =
+      anterior &&
+      anterior.tipo === e.tipo &&
+      anterior.hora_inicio === e.hora_inicio &&
+      anterior.hora_fin === e.hora_fin &&
+      anterior.motivo === e.motivo &&
+      aISO(addDays(deISO(anterior.fechaHasta), 1)) === e.fecha
+    if (siguiente && anterior) {
+      anterior.ids.push(e.id)
+      anterior.fechaHasta = e.fecha
+    } else {
+      grupos.push({
+        ids: [e.id],
+        fechaDesde: e.fecha,
+        fechaHasta: e.fecha,
+        tipo: e.tipo,
+        hora_inicio: e.hora_inicio,
+        hora_fin: e.hora_fin,
+        motivo: e.motivo,
+      })
+    }
+  }
+  return grupos
+}
 
 function solapaExistente(
   tramos: Tramo[],
@@ -147,7 +203,8 @@ function DiasEspeciales() {
   const eliminar = useEliminarExcepcion()
 
   const [abierto, setAbierto] = useState(false)
-  const [fecha, setFecha] = useState('')
+  const [desde, setDesde] = useState('')
+  const [hasta, setHasta] = useState('')
   const [tipo, setTipo] = useState<'bloqueo' | 'extra'>('bloqueo')
   const [todoElDia, setTodoElDia] = useState(true)
   const [inicio, setInicio] = useState('16:00')
@@ -155,21 +212,36 @@ function DiasEspeciales() {
   const [motivo, setMotivo] = useState('')
   const [error, setError] = useState('')
 
+  const grupos = agruparExcepciones(excepciones ?? [])
+
   async function anadir(e: FormEvent) {
     e.preventDefault()
-    if (!fecha) return
+    if (!desde) return
+    const fechaHasta = hasta || desde
+    if (fechaHasta < desde) {
+      setError('"Hasta" debe ser igual o posterior a "Desde".')
+      return
+    }
     if (!todoElDia && aMinutos(fin) <= aMinutos(inicio)) {
       setError('La hora de fin debe ser posterior.')
       return
     }
-    await crear.mutateAsync({
-      fecha,
-      tipo,
-      hora_inicio: todoElDia ? null : inicio,
-      hora_fin: todoElDia ? null : fin,
-      motivo: motivo.trim() || null,
-    })
-    setFecha('')
+    const dias = rangoFechas(desde, fechaHasta)
+    if (dias.length > MAX_DIAS_RANGO) {
+      setError(`El rango es demasiado largo (máximo ${MAX_DIAS_RANGO} días).`)
+      return
+    }
+    await crear.mutateAsync(
+      dias.map((fecha) => ({
+        fecha,
+        tipo,
+        hora_inicio: todoElDia ? null : inicio,
+        hora_fin: todoElDia ? null : fin,
+        motivo: motivo.trim() || null,
+      })),
+    )
+    setDesde('')
+    setHasta('')
     setMotivo('')
     setError('')
     setAbierto(false)
@@ -179,34 +251,39 @@ function DiasEspeciales() {
     <Tarjeta>
       <h2 className="font-display text-base font-semibold text-ink">Días especiales</h2>
       <p className="mt-1 text-sm text-muted">
-        Bloqueos puntuales (vacaciones, una tarde libre) u horas extra fuera de tu
-        semana habitual.
+        Bloqueos puntuales (vacaciones, una semana libre) u horas extra fuera de tu
+        semana habitual. Puedes añadir un solo día o un rango de fechas.
       </p>
 
-      {excepciones?.length ? (
+      {grupos.length ? (
         <ul className="mt-4 flex flex-col divide-y divide-line">
-          {excepciones.map((e) => (
-            <li key={e.id} className="flex items-center gap-3 py-2.5">
+          {grupos.map((g) => (
+            <li key={g.ids[0]} className="flex items-center gap-3 py-2.5">
               <span
                 className={[
                   'rounded-md px-1.5 py-0.5 text-[11px] font-medium',
-                  e.tipo === 'bloqueo'
+                  g.tipo === 'bloqueo'
                     ? 'bg-crit-soft text-crit'
                     : 'bg-good-soft text-good',
                 ].join(' ')}
               >
-                {e.tipo === 'bloqueo' ? 'Bloqueo' : 'Extra'}
+                {g.tipo === 'bloqueo' ? 'Bloqueo' : 'Extra'}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-ink">{fechaCorta(e.fecha)}</p>
+                <p className="text-sm font-medium text-ink">
+                  {g.fechaDesde === g.fechaHasta
+                    ? fechaCorta(g.fechaDesde)
+                    : `${fechaCorta(g.fechaDesde)} – ${fechaCorta(g.fechaHasta)}`}
+                </p>
                 <p className="truncate text-xs text-muted">
-                  {e.hora_inicio ? franja(e.hora_inicio, e.hora_fin!) : 'Todo el día'}
-                  {e.motivo ? ` · ${e.motivo}` : ''}
+                  {g.hora_inicio ? franja(g.hora_inicio, g.hora_fin!) : 'Todo el día'}
+                  {g.motivo ? ` · ${g.motivo}` : ''}
+                  {g.ids.length > 1 ? ` · ${g.ids.length} días` : ''}
                 </p>
               </div>
               <button
                 type="button"
-                onClick={() => eliminar.mutate(e.id)}
+                onClick={() => eliminar.mutate(g.ids)}
                 className="-m-1.5 inline-flex items-center p-1.5 text-xs font-medium text-crit hover:underline"
               >
                 Quitar
@@ -222,23 +299,33 @@ function DiasEspeciales() {
         <form onSubmit={anadir} className="mt-4 flex flex-col gap-3 rounded-xl bg-surface-2 p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="flex flex-col gap-1 text-xs font-medium text-muted">
-              Fecha
+              Desde
               <Input
                 type="date"
-                value={fecha}
+                value={desde}
                 min={new Date().toISOString().slice(0, 10)}
-                onChange={(e) => setFecha(e.target.value)}
+                onChange={(e) => setDesde(e.target.value)}
                 required
               />
             </label>
             <label className="flex flex-col gap-1 text-xs font-medium text-muted">
-              Tipo
-              <Select value={tipo} onChange={(e) => setTipo(e.target.value as 'bloqueo' | 'extra')}>
-                <option value="bloqueo">Bloqueo</option>
-                <option value="extra">Horas extra</option>
-              </Select>
+              Hasta (opcional)
+              <Input
+                type="date"
+                value={hasta}
+                min={desde || new Date().toISOString().slice(0, 10)}
+                onChange={(e) => setHasta(e.target.value)}
+                placeholder="Mismo día"
+              />
             </label>
           </div>
+          <label className="flex flex-col gap-1 text-xs font-medium text-muted">
+            Tipo
+            <Select value={tipo} onChange={(e) => setTipo(e.target.value as 'bloqueo' | 'extra')}>
+              <option value="bloqueo">Bloqueo</option>
+              <option value="extra">Horas extra</option>
+            </Select>
+          </label>
           <label className="flex items-center gap-2 text-sm text-ink">
             <input
               type="checkbox"
@@ -246,7 +333,7 @@ function DiasEspeciales() {
               onChange={(e) => setTodoElDia(e.target.checked)}
               className="size-4 rounded border-line-strong"
             />
-            Todo el día
+            Todo el día (todos los días del rango)
           </label>
           {!todoElDia && (
             <div className="flex items-center gap-2">
@@ -262,7 +349,7 @@ function DiasEspeciales() {
           />
           {error && <p className="text-xs text-crit">{error}</p>}
           <div className="flex gap-2">
-            <Boton type="submit" disabled={crear.isPending}>Guardar</Boton>
+            <Boton type="submit" cargando={crear.isPending}>Guardar</Boton>
             <Boton type="button" variante="secundario" onClick={() => setAbierto(false)}>
               Cancelar
             </Boton>

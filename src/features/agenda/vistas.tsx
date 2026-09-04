@@ -72,14 +72,14 @@ export function VistaSemana({
   onClickClase: (id: string) => void
   onDia: (d: Date) => void
 }) {
-  const dias = diasDeLaSemana(fecha)
+  const dias = diasDeLaSemana(fecha).slice(0, 5) // lunes a viernes
   const cfg = useMemo(() => calcularRejilla(clases, 52), [clases])
   const porFecha = agrupaPorFecha(clases)
   const hoy = new Date()
 
   return (
     <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
-      <div className="min-w-[42rem]">
+      <div className="min-w-[32rem]">
         <div className="sticky top-0 z-10 flex border-b border-line bg-surface/95 backdrop-blur">
           <div className="w-12 shrink-0" />
           {dias.map((d) => {
