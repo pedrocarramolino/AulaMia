@@ -83,7 +83,14 @@ RLS. En producción el código se elimina en el build.
 - **Web Push**: `push-sw.js` (importado por el SW), Edge Function
   `enviar-recordatorios` (verify_jwt off, auth por `x-cron-secret`), VAPID en
   `app.app_config` leído vía `public.config_push()` (solo `service_role`).
-- Rutas con `React.lazy` + un único `<Suspense>` en `App.tsx`. Bundle principal ~72 kB gzip.
+- Rutas con `React.lazy` + un único `<Suspense>` en `App.tsx`. Carga inicial ~134 kB gzip.
+- Las dependencias van en chunks propios (`manualChunks` en `vite.config.ts`): sin eso
+  Rollup las mezcla con el código de la app y basta un cambio menor para invalidar la
+  caché de todo. Los nombres de los chunks salen de ahí, no del primer módulo que pille.
+- `build/supabase-sin-usar/` sustituye realtime, storage y functions de supabase-js por
+  stubs: no los usamos, pero el constructor del cliente los instancia siempre, así que
+  el tree-shaking no los quita (arrastraban también `phoenix` e `iceberg-js`). Los
+  stubs avisan en alto si se llaman; para recuperarlos, quita el alias de `vite.config.ts`.
 - Charts = barras `div`, sin librería.
 
 ## Convenciones al añadir cosas
