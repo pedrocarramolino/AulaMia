@@ -56,6 +56,37 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // supabase-js instancia realtime y storage en su constructor, así que el
+      // tree-shaking no los quita aunque AulaMia no los use. Los sustituimos por
+      // stubs que avisan en alto si algún día se llaman de verdad.
+      // Ver `build/supabase-sin-usar/`.
+      '@supabase/realtime-js': fileURLToPath(
+        new URL('./build/supabase-sin-usar/realtime.ts', import.meta.url),
+      ),
+      '@supabase/storage-js': fileURLToPath(
+        new URL('./build/supabase-sin-usar/storage.ts', import.meta.url),
+      ),
+      '@supabase/functions-js': fileURLToPath(
+        new URL('./build/supabase-sin-usar/functions.ts', import.meta.url),
+      ),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        // Sin esto Rollup mezcla las dependencias con el código de la app en un
+        // chunk que bautiza con el primer módulo que encuentra (salía `iconos`,
+        // que en realidad era Supabase entero). Separarlas da nombres honestos y
+        // evita que cada cambio de la app invalide la caché de las librerías.
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+          if (id.includes('@supabase')) return 'supabase'
+          if (id.includes('react-router')) return 'router'
+          if (id.includes('@tanstack')) return 'consultas'
+          if (id.includes('date-fns')) return 'fechas'
+          if (id.includes('react-dom') || id.includes('scheduler')) return 'react'
+        },
+      },
     },
   },
   server: {
