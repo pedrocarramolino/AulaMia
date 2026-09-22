@@ -35,6 +35,10 @@ pantallas.
 - Node vive en `~/.local/node/bin` (no hay Homebrew). El dev server se lanza con
   `.claude/launch.json` invocando el binario `node` directo sobre `vite`.
 - `npm run build` hace typecheck completo; déjalo en verde antes de cerrar una fase.
+- `vercel.json` reescribe todas las rutas a `index.html`. Sin eso Vercel busca un
+  fichero por cada ruta y devuelve 404 en todo lo que no sea `/` (entrar por un
+  enlace directo, recargar en cualquier pantalla). Los rewrites se evalúan después
+  del sistema de ficheros, así que `assets/`, `sw.js` y los iconos siguen intactos.
 
 ## Vista previa sin sesión (solo desarrollo)
 
