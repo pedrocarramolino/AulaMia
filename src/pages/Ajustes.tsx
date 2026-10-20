@@ -12,10 +12,10 @@ import {
   IconoFlechaIzq,
 } from '@/components/iconos'
 import { usePreferencias, useGuardarPreferencias } from '@/features/recordatorios/api'
+import { HORA_AVISO_DEFECTO } from '@/features/recordatorios/avisos'
+import { SelectorDiasAviso } from '@/features/recordatorios/componentes'
 import { CopiasSeguridad } from '@/features/copias/CopiasSeguridad'
 import { NotificacionesPush } from '@/features/copias/NotificacionesPush'
-
-const DIAS_EXAMEN = [1, 3, 7, 14]
 
 function CambiarContrasena() {
   const [p1, setP1] = useState('')
@@ -103,19 +103,12 @@ function ConfigRecordatorios() {
 
   if (!pref) return null
 
-  const toggleDia = (d: number) => {
-    const dias = pref.examen_dias.includes(d)
-      ? pref.examen_dias.filter((x) => x !== d)
-      : [...pref.examen_dias, d].sort((a, b) => b - a)
-    guardar.mutate({ examen_dias: dias })
-  }
-
   return (
     <Tarjeta>
       <h2 className="font-display text-base font-semibold text-ink">Recordatorios</h2>
       <p className="mt-1 text-sm text-muted">
-        Los avisos aparecen en la pantalla de Hoy. Las notificaciones al móvil llegan
-        en la Fase 08.
+        Los avisos aparecen en la pantalla de Hoy y, si activas las notificaciones,
+        también en este dispositivo.
       </p>
 
       <div className="mt-4 flex flex-col gap-4">
@@ -135,25 +128,14 @@ function ConfigRecordatorios() {
 
         <div className="flex flex-col gap-1.5">
           <span className="text-sm font-medium text-ink">Antes de un examen</span>
-          <div className="flex flex-wrap gap-2">
-            {DIAS_EXAMEN.map((d) => {
-              const activo = pref.examen_dias.includes(d)
-              return (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => toggleDia(d)}
-                  className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                    activo
-                      ? 'border-accent bg-accent-soft text-accent-ink'
-                      : 'border-line text-muted hover:bg-surface-2'
-                  }`}
-                >
-                  {d} {d === 1 ? 'día' : 'días'}
-                </button>
-              )
-            })}
-          </div>
+          <SelectorDiasAviso
+            valor={pref.examen_dias}
+            onChange={(dias) => guardar.mutate({ examen_dias: dias })}
+          />
+          <p className="text-xs text-muted">
+            A las {HORA_AVISO_DEFECTO}. Cada examen puede tener los suyos propios al crearlo o
+            editarlo.
+          </p>
         </div>
 
         <label className="flex items-center justify-between gap-4 text-sm font-medium text-ink">

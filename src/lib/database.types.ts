@@ -316,6 +316,8 @@ export type Database = {
         Row: {
           actualizado_en: string
           alumno_id: string
+          aviso_hora: string | null
+          avisos_dias: number[] | null
           creado_en: string
           fecha: string
           id: string
@@ -329,6 +331,8 @@ export type Database = {
         Insert: {
           actualizado_en?: string
           alumno_id: string
+          aviso_hora?: string | null
+          avisos_dias?: number[] | null
           creado_en?: string
           fecha: string
           id?: string
@@ -342,6 +346,8 @@ export type Database = {
         Update: {
           actualizado_en?: string
           alumno_id?: string
+          aviso_hora?: string | null
+          avisos_dias?: number[] | null
           creado_en?: string
           fecha?: string
           id?: string

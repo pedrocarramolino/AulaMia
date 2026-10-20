@@ -1,9 +1,16 @@
 // AulaMia · Edge Function · enviar-recordatorios
 // Lo invoca pg_cron cada 5 min con la cabecera x-cron-secret.
 // Envía Web Push de los recordatorios vencidos y los marca como enviados.
+//
+// Solo los que vencieron hace menos de VENTANA_MIN: si el cron pasa un tiempo
+// sin funcionar, al volver no debe disparar de golpe todos los atrasados (un
+// «Clase en 30 min» de hace semanas no sirve). Los más viejos se quedan en
+// `pendiente` y siguen apareciendo en los avisos de Hoy.
 
 import webpush from 'npm:web-push@3.6.7'
 import { createClient } from 'jsr:@supabase/supabase-js@2'
+
+const VENTANA_MIN = 30
 
 Deno.serve(async (req: Request) => {
   const admin = createClient(
@@ -22,11 +29,13 @@ Deno.serve(async (req: Request) => {
 
   webpush.setVapidDetails(cfg.vapid_subject, cfg.vapid_public, cfg.vapid_private)
 
+  const ahora = Date.now()
   const { data: pendientes } = await admin
     .from('recordatorio')
     .select('*')
     .eq('estado', 'pendiente')
-    .lte('dispara_en', new Date().toISOString())
+    .lte('dispara_en', new Date(ahora).toISOString())
+    .gte('dispara_en', new Date(ahora - VENTANA_MIN * 60_000).toISOString())
     .limit(200)
 
   let enviados = 0
