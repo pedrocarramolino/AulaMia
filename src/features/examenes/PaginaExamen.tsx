@@ -10,6 +10,7 @@ import { usePreferencias } from '@/features/recordatorios/api'
 import { HORA_AVISO_DEFECTO, describirAvisos } from '@/features/recordatorios/avisos'
 import { hora } from '@/lib/fechas'
 import { DiasBadge, NivelPreparacion } from './componentes'
+import { ApuntesExamen } from './Apuntes'
 import { generarPasosRepaso } from './generador'
 import {
   useExamen,
@@ -182,6 +183,8 @@ export function PaginaExamen() {
           </div>
         )}
       </Tarjeta>
+
+      <ApuntesExamen examen={examen} />
 
       {/* Plan de repaso */}
       <section className="mt-5">

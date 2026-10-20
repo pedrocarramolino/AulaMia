@@ -98,10 +98,16 @@ RLS. En producción el código se elimina en el build.
 - Las dependencias van en chunks propios (`manualChunks` en `vite.config.ts`): sin eso
   Rollup las mezcla con el código de la app y basta un cambio menor para invalidar la
   caché de todo. Los nombres de los chunks salen de ahí, no del primer módulo que pille.
-- `build/supabase-sin-usar/` sustituye realtime, storage y functions de supabase-js por
-  stubs: no los usamos, pero el constructor del cliente los instancia siempre, así que
-  el tree-shaking no los quita (arrastraban también `phoenix` e `iceberg-js`). Los
-  stubs avisan en alto si se llaman; para recuperarlos, quita el alias de `vite.config.ts`.
+- `build/supabase-sin-usar/` sustituye realtime y storage de supabase-js por stubs: no
+  los usamos, pero el constructor del cliente los instancia siempre, así que el
+  tree-shaking no los quita (arrastraban también `phoenix` e `iceberg-js`). Los stubs
+  avisan en alto si se llaman; para recuperarlos, quita el alias de `vite.config.ts`.
+  (`functions-js` tuvo stub hasta que los apuntes empezaron a llamar a una Edge Function.)
+- **Apuntes de examen**: Edge Function `generar-apuntes` (verify_jwt on; reenvía el JWT
+  del usuario, así que RLS aplica) llama a Claude (`claude-opus-5-5`, salida JSON con
+  esquema, `fallbacks: "default"`) y guarda en `apuntes_examen` (uno por examen).
+  Necesita el secreto `ANTHROPIC_API_KEY` en las Edge Functions. No van en las copias
+  de seguridad: se pueden regenerar.
 - Charts = barras `div`, sin librería.
 
 ## Convenciones al añadir cosas

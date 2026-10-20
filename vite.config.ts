@@ -66,9 +66,6 @@ export default defineConfig({
       '@supabase/storage-js': fileURLToPath(
         new URL('./build/supabase-sin-usar/storage.ts', import.meta.url),
       ),
-      '@supabase/functions-js': fileURLToPath(
-        new URL('./build/supabase-sin-usar/functions.ts', import.meta.url),
-      ),
     },
   },
   build: {
