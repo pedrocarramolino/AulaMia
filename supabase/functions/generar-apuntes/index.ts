@@ -8,7 +8,8 @@
 // Proveedor según el secreto que haya en las Edge Functions:
 //   ANTHROPIC_API_KEY → Claude (de pago, mejor calidad)
 //   GEMINI_API_KEY    → Gemini Flash (plan gratuito de Google, con límite diario)
-// Si están los dos, Claude.
+//   GROQ_API_KEY      → gpt-oss-120b en Groq (gratis sin tarjeta, con límite diario)
+// Si hay varios, el primero de la lista.
 
 import Anthropic from 'npm:@anthropic-ai/sdk@0.136.0'
 import { ApiError, FinishReason, GoogleGenAI } from 'npm:@google/genai@2.30.0'
@@ -16,6 +17,7 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 const MODELO_CLAUDE = 'claude-opus-5-5'
 const MODELO_GEMINI = 'gemini-2.5-flash'
+const MODELO_GROQ = 'openai/gpt-oss-120b'
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -157,12 +159,55 @@ async function conGemini(apiKey: string, peticion: string): Promise<Resultado> {
   return { ok: true, texto, modelo: MODELO_GEMINI }
 }
 
+// API compatible con la de OpenAI. En el plan gratuito el límite es de 8000 tokens
+// por minuto contando entrada + max_completion_tokens, así que la salida va justa.
+async function conGroq(apiKey: string, peticion: string): Promise<Resultado> {
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: MODELO_GROQ,
+      max_completion_tokens: 6000,
+      reasoning_effort: 'low',
+      response_format: {
+        type: 'json_schema',
+        json_schema: { name: 'apuntes', strict: true, schema: ESQUEMA },
+      },
+      messages: [
+        { role: 'system', content: SISTEMA },
+        { role: 'user', content: peticion },
+      ],
+    }),
+  })
+
+  if (!res.ok) {
+    const detalle = await res.text()
+    if (res.status === 401 || res.status === 403) return { ok: false, error: 'clave_invalida', status: 502 }
+    if (res.status === 429) return { ok: false, error: 'limite', status: 429 }
+    // 413: la petición sola ya pasa del límite por minuto.
+    if (res.status === 413) return { ok: false, error: 'demasiado_largo', status: 422 }
+    return { ok: false, error: 'api', status: 502, detalle }
+  }
+
+  const respuesta = (await res.json()) as {
+    choices?: { finish_reason: string; message: { content: string | null } }[]
+  }
+  const eleccion = respuesta.choices?.[0]
+  if (eleccion?.finish_reason === 'content_filter') return { ok: false, error: 'rechazado', status: 422 }
+  if (eleccion?.finish_reason === 'length') return { ok: false, error: 'demasiado_largo', status: 422 }
+
+  const texto = eleccion?.message.content
+  if (!texto) return { ok: false, error: 'sin_respuesta', status: 502 }
+  return { ok: true, texto, modelo: MODELO_GROQ }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   const claveClaude = Deno.env.get('ANTHROPIC_API_KEY')
   const claveGemini = Deno.env.get('GEMINI_API_KEY')
-  if (!claveClaude && !claveGemini) return json({ error: 'falta_clave' }, 500)
+  const claveGroq = Deno.env.get('GROQ_API_KEY')
+  if (!claveClaude && !claveGemini && !claveGroq) return json({ error: 'falta_clave' }, 500)
 
   const { examen_id, descripcion, enfoque } = (await req.json()) as {
     examen_id?: string
@@ -199,7 +244,9 @@ Deno.serve(async (req: Request) => {
 
   const resultado = claveClaude
     ? await conClaude(claveClaude, peticion)
-    : await conGemini(claveGemini!, peticion)
+    : claveGemini
+      ? await conGemini(claveGemini, peticion)
+      : await conGroq(claveGroq!, peticion)
   if (!resultado.ok) {
     return json({ error: resultado.error, detalle: resultado.detalle }, resultado.status)
   }

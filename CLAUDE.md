@@ -107,8 +107,10 @@ RLS. En producción el código se elimina en el build.
   del usuario, así que RLS aplica) y guarda en `apuntes_examen` (uno por examen). El
   proveedor lo decide el secreto presente: `ANTHROPIC_API_KEY` → Claude
   (`claude-opus-5-5`, `fallbacks: "default"`), si no `GEMINI_API_KEY` → Gemini
-  (`gemini-2.5-flash`, plan gratuito con límite diario). Mismo prompt y mismo esquema
-  JSON para los dos. No van en las copias de seguridad: se pueden regenerar.
+  (`gemini-2.5-flash`, plan gratuito con límite diario), si no `GROQ_API_KEY` → Groq
+  (`openai/gpt-oss-120b` vía `fetch`, gratis sin tarjeta; 8000 tokens/min contando
+  `max_completion_tokens`, por eso la salida va a 6000). Mismo prompt y mismo esquema
+  JSON para los tres. No van en las copias de seguridad: se pueden regenerar.
 - Charts = barras `div`, sin librería.
 
 ## Convenciones al añadir cosas
