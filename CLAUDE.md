@@ -109,7 +109,8 @@ RLS. En producción el código se elimina en el build.
   (`claude-opus-5-5`, `fallbacks: "default"`), si no `GEMINI_API_KEY` → Gemini
   (`gemini-2.5-flash`, plan gratuito con límite diario), si no `GROQ_API_KEY` → Groq
   (`openai/gpt-oss-120b` vía `fetch`, gratis sin tarjeta; 8000 tokens/min contando
-  `max_completion_tokens`, por eso la salida va a 6000). Mismo prompt y mismo esquema
+  `max_completion_tokens`, por eso la salida va a 7000; reintenta una vez si devuelve
+  `json_validate_failed`, que pasa a veces aun con `strict`). Mismo prompt y mismo esquema
   JSON para los tres. No van en las copias de seguridad: se pueden regenerar.
 - Charts = barras `div`, sin librería.
 

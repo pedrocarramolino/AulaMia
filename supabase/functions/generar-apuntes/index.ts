@@ -160,25 +160,34 @@ async function conGemini(apiKey: string, peticion: string): Promise<Resultado> {
 }
 
 // API compatible con la de OpenAI. En el plan gratuito el límite es de 8000 tokens
-// por minuto contando entrada + max_completion_tokens, así que la salida va justa.
+// por minuto contando entrada + max_completion_tokens, así que la salida va justa
+// (5 temas ≈ 5000 tokens con el razonamiento incluido).
 async function conGroq(apiKey: string, peticion: string): Promise<Resultado> {
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: MODELO_GROQ,
-      max_completion_tokens: 6000,
-      reasoning_effort: 'low',
-      response_format: {
-        type: 'json_schema',
-        json_schema: { name: 'apuntes', strict: true, schema: ESQUEMA },
-      },
-      messages: [
-        { role: 'system', content: SISTEMA },
-        { role: 'user', content: peticion },
-      ],
-    }),
-  })
+  const pedir = () =>
+    fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODELO_GROQ,
+        max_completion_tokens: 7000,
+        reasoning_effort: 'medium',
+        response_format: {
+          type: 'json_schema',
+          json_schema: { name: 'apuntes', strict: true, schema: ESQUEMA },
+        },
+        messages: [
+          { role: 'system', content: SISTEMA },
+          { role: 'user', content: peticion },
+        ],
+      }),
+    })
+
+  let res = await pedir()
+  // Groq valida el JSON después de generarlo y, si no cuadra con el esquema,
+  // responde 400 json_validate_failed. Suele salir bien a la segunda.
+  if (res.status === 400 && (await res.clone().text()).includes('json_validate_failed')) {
+    res = await pedir()
+  }
 
   if (!res.ok) {
     const detalle = await res.text()
