@@ -6,7 +6,11 @@ import { IconoFlechaIzq, IconoMas1, IconoX } from '@/components/iconos'
 import { fechaCorta, fechaLarga } from '@/lib/fechas'
 import { AvatarAlumno } from '@/features/alumnos/componentes'
 import { useClasesDeAlumno } from '@/features/agenda/api'
+import { usePreferencias } from '@/features/recordatorios/api'
+import { HORA_AVISO_DEFECTO, describirAvisos } from '@/features/recordatorios/avisos'
+import { hora } from '@/lib/fechas'
 import { DiasBadge, NivelPreparacion } from './componentes'
+import { ApuntesExamen } from './Apuntes'
 import { generarPasosRepaso } from './generador'
 import {
   useExamen,
@@ -68,6 +72,7 @@ export function PaginaExamen() {
   const { data: examen, isLoading, error } = useExamen(id)
   const { data: pasos } = usePlanExamen(id)
   const { data: clases } = useClasesDeAlumno(examen?.alumno_id)
+  const { data: pref } = usePreferencias()
 
   const actualizar = useActualizarExamen()
   const eliminar = useEliminarExamen()
@@ -157,6 +162,19 @@ export function PaginaExamen() {
               />
             </dd>
           </div>
+          <div className="flex justify-between gap-4 py-2.5">
+            <dt className="text-muted">Avisos</dt>
+            <dd className="text-right font-medium text-ink">
+              {examen.avisos_dias
+                ? describirAvisos(
+                    examen.avisos_dias,
+                    examen.aviso_hora ? hora(examen.aviso_hora) : HORA_AVISO_DEFECTO,
+                  )
+                : pref
+                  ? `${describirAvisos(pref.examen_dias, HORA_AVISO_DEFECTO)} (Ajustes)`
+                  : '—'}
+            </dd>
+          </div>
         </dl>
         {examen.temario && (
           <div className="mt-3">
@@ -165,6 +183,8 @@ export function PaginaExamen() {
           </div>
         )}
       </Tarjeta>
+
+      <ApuntesExamen examen={examen} />
 
       {/* Plan de repaso */}
       <section className="mt-5">

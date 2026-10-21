@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { claves } from '@/lib/claves'
 import type { Tables, TablesInsert, TablesUpdate } from '@/lib/database.types'
@@ -176,5 +177,70 @@ export function useEliminarPaso(examenId: string) {
       if (error) throw error
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: claves.planExamen(examenId) }),
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Apuntes generados (Edge Function `generar-apuntes`)
+// ---------------------------------------------------------------------------
+
+export interface TemaApuntes {
+  titulo: string
+  explicacion: string
+  puntos_clave: string[]
+  conceptos: { termino: string; definicion: string }[]
+  preguntas: { pregunta: string; respuesta: string }[]
+}
+
+export type ApuntesExamen = Omit<Tables<'apuntes_examen'>, 'contenido'> & {
+  contenido: { temas: TemaApuntes[] }
+}
+
+export function useApuntesExamen(examenId: string | undefined) {
+  return useQuery({
+    queryKey: claves.apuntesExamen(examenId ?? ''),
+    enabled: !!examenId,
+    queryFn: async (): Promise<ApuntesExamen | null> => {
+      const { data, error } = await supabase
+        .from('apuntes_examen')
+        .select('*')
+        .eq('examen_id', examenId!)
+        .maybeSingle()
+      if (error) throw error
+      return data as ApuntesExamen | null
+    },
+  })
+}
+
+const ERRORES_APUNTES: Record<string, string> = {
+  falta_clave:
+    'Falta configurar la clave: añade el secreto GROQ_API_KEY o GEMINI_API_KEY (gratis) o ANTHROPIC_API_KEY en las Edge Functions de Supabase.',
+  clave_invalida: 'La clave configurada no es válida (o, si es de Anthropic, no tiene saldo).',
+  limite:
+    'Has llegado al límite de peticiones. Prueba en un minuto; si usas un plan gratuito y sigue fallando, se renueva cada día.',
+  rechazado: 'No se han podido generar estos apuntes. Prueba a describir el examen de otra forma.',
+  demasiado_largo:
+    'El examen abarca demasiado para unos apuntes. Prueba a centrarlo en menos temas.',
+}
+
+export function useGenerarApuntes(examenId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (entrada: { descripcion: string; enfoque: string }) => {
+      const { error } = await supabase.functions.invoke('generar-apuntes', {
+        body: { examen_id: examenId, ...entrada },
+      })
+      if (!error) return
+      let codigo = ''
+      if (error instanceof FunctionsHttpError) {
+        try {
+          codigo = ((await error.context.json()) as { error?: string }).error ?? ''
+        } catch {
+          // Respuesta sin JSON: se queda el mensaje genérico.
+        }
+      }
+      throw new Error(ERRORES_APUNTES[codigo] ?? 'No se han podido generar los apuntes. Inténtalo de nuevo.')
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: claves.apuntesExamen(examenId) }),
   })
 }

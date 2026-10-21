@@ -78,24 +78,48 @@ RLS. En producción el código se elimina en el build.
 - `src/features/planificador/motor.ts` — puro. Scoring + huecos libres.
 - `src/features/recordatorios/` — reglas en `perfil.preferencias`,
   `app.generar_recordatorios()` + pg_cron, avisos in-app (`Avisos.tsx` en Hoy).
+- **Avisos por examen**: `examen.avisos_dias` (NULL = los de Ajustes, `{}` = ninguno) y
+  `examen.aviso_hora` (NULL = 09:00). El trigger `examen_resembrar_avisos` rehace los
+  avisos al crear/editar/borrar un examen, y `perfil_resembrar_avisos` al cambiar Ajustes.
+  Solo se programan avisos con la hora aún por llegar.
+- **Horas en Madrid**: la BD trabaja en UTC, pero `fecha`/`hora_inicio` son hora local.
+  Todo `fecha + hora` que acabe en un `timestamptz` pasa por `at time zone 'Europe/Madrid'`.
 - `src/features/copias/` — export JSON (cliente) + import (`public.importar_datos`
   → `app.importar_datos`, desactiva el trigger de resiembra), y suscripción Web Push.
 - **Web Push**: `push-sw.js` (importado por el SW), Edge Function
   `enviar-recordatorios` (verify_jwt off, auth por `x-cron-secret`), VAPID en
   `app.app_config` leído vía `public.config_push()` (solo `service_role`).
+  El cron la llama con `net.http_post` (pg_net vive en el esquema `net`, no en
+  `extensions`). Solo envía lo vencido en los últimos 30 min, para no disparar
+  atrasados si el cron se cae y vuelve.
+- **Proyecto compartido**: el mismo Supabase aloja otra app, **Cauce** (esquema `cauce`,
+  cron `cauce-enviar-push`, Edge Function `cauce-send`). No es de AulaMia: no tocarla.
 - Rutas con `React.lazy` + un único `<Suspense>` en `App.tsx`. Carga inicial ~134 kB gzip.
 - Las dependencias van en chunks propios (`manualChunks` en `vite.config.ts`): sin eso
   Rollup las mezcla con el código de la app y basta un cambio menor para invalidar la
   caché de todo. Los nombres de los chunks salen de ahí, no del primer módulo que pille.
-- `build/supabase-sin-usar/` sustituye realtime, storage y functions de supabase-js por
-  stubs: no los usamos, pero el constructor del cliente los instancia siempre, así que
-  el tree-shaking no los quita (arrastraban también `phoenix` e `iceberg-js`). Los
-  stubs avisan en alto si se llaman; para recuperarlos, quita el alias de `vite.config.ts`.
+- `build/supabase-sin-usar/` sustituye realtime y storage de supabase-js por stubs: no
+  los usamos, pero el constructor del cliente los instancia siempre, así que el
+  tree-shaking no los quita (arrastraban también `phoenix` e `iceberg-js`). Los stubs
+  avisan en alto si se llaman; para recuperarlos, quita el alias de `vite.config.ts`.
+  (`functions-js` tuvo stub hasta que los apuntes empezaron a llamar a una Edge Function.)
+- **Apuntes de examen**: Edge Function `generar-apuntes` (verify_jwt on; reenvía el JWT
+  del usuario, así que RLS aplica) y guarda en `apuntes_examen` (uno por examen). El
+  proveedor lo decide el secreto presente: `ANTHROPIC_API_KEY` → Claude
+  (`claude-opus-5-5`, `fallbacks: "default"`), si no `GEMINI_API_KEY` → Gemini
+  (`gemini-2.5-flash`, plan gratuito con límite diario), si no `GROQ_API_KEY` → Groq
+  (`openai/gpt-oss-120b` vía `fetch`, gratis sin tarjeta; 8000 tokens/min contando
+  `max_completion_tokens`, por eso la salida va a 7000; reintenta una vez si devuelve
+  `json_validate_failed`, que pasa a veces aun con `strict`). Mismo prompt y mismo esquema
+  JSON para los tres. No van en las copias de seguridad: se pueden regenerar.
 - Charts = barras `div`, sin librería.
 
 ## Convenciones al añadir cosas
 
 - DDL → `apply_migration` + guardar el `.sql`. Regenerar tipos. `get_advisors` en verde.
+- `apply_migration` / `execute_sql` con `delete` o `alter table … disable trigger` piden
+  confirmación al usuario y, sin ella, caducan a los 60 s sin aplicar nada. Separa esas
+  sentencias en su propia migración y avisa de que hay que aprobarla.
 - Función nueva callable por el cliente: si necesita SECURITY DEFINER, ponla en `app.*`
   y expón un wrapper `public.*` SECURITY INVOKER (patrón de `generar_clases`,
   `importar_datos`). Así no salta el advisor.

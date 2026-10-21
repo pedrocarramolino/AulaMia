@@ -116,6 +116,44 @@ export type Database = {
           },
         ]
       }
+      apuntes_examen: {
+        Row: {
+          contenido: Json
+          creado_en: string
+          descripcion: string
+          enfoque: string | null
+          examen_id: string
+          modelo: string
+          user_id: string
+        }
+        Insert: {
+          contenido: Json
+          creado_en?: string
+          descripcion: string
+          enfoque?: string | null
+          examen_id: string
+          modelo: string
+          user_id?: string
+        }
+        Update: {
+          contenido?: Json
+          creado_en?: string
+          descripcion?: string
+          enfoque?: string | null
+          examen_id?: string
+          modelo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "apuntes_examen_examen_id_fkey"
+            columns: ["examen_id"]
+            isOneToOne: true
+            referencedRelation: "examen"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cambio_clase: {
         Row: {
           clase_id: string
@@ -316,6 +354,8 @@ export type Database = {
         Row: {
           actualizado_en: string
           alumno_id: string
+          aviso_hora: string | null
+          avisos_dias: number[] | null
           creado_en: string
           fecha: string
           id: string
@@ -329,6 +369,8 @@ export type Database = {
         Insert: {
           actualizado_en?: string
           alumno_id: string
+          aviso_hora?: string | null
+          avisos_dias?: number[] | null
           creado_en?: string
           fecha: string
           id?: string
@@ -342,6 +384,8 @@ export type Database = {
         Update: {
           actualizado_en?: string
           alumno_id?: string
+          aviso_hora?: string | null
+          avisos_dias?: number[] | null
           creado_en?: string
           fecha?: string
           id?: string

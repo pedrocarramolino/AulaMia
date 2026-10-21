@@ -5,8 +5,19 @@ import { Campo, Input, Select, Textarea, InputFecha } from '@/components/campos'
 import { IconoFlechaIzq } from '@/components/iconos'
 import { useAlumnos } from '@/features/alumnos/api'
 import { useMaterias } from '@/features/materias/api'
+import { usePreferencias } from '@/features/recordatorios/api'
+import {
+  HORA_AVISO_DEFECTO,
+  avisosPasados,
+  describirAvisos,
+  etiquetaDias,
+} from '@/features/recordatorios/avisos'
+import { SelectorDiasAviso } from '@/features/recordatorios/componentes'
+import { hora } from '@/lib/fechas'
 import { NivelPreparacion } from './componentes'
 import { useExamen, useCrearExamen, useActualizarExamen } from './api'
+
+type ModoAvisos = 'ajustes' | 'propios'
 
 interface Campos {
   alumno_id: string
@@ -15,7 +26,15 @@ interface Campos {
   fecha: string
   temario: string
   nivel_preparacion: number
+  avisos: ModoAvisos
+  avisos_dias: number[]
+  aviso_hora: string
 }
+
+const OPCIONES_AVISOS: { valor: ModoAvisos; etiqueta: string }[] = [
+  { valor: 'ajustes', etiqueta: 'Como en Ajustes' },
+  { valor: 'propios', etiqueta: 'Elegir para este examen' },
+]
 
 export function EditorExamen() {
   const { id } = useParams()
@@ -26,6 +45,7 @@ export function EditorExamen() {
   const { data: alumnos } = useAlumnos()
   const { data: materias } = useMaterias()
   const { data: examen, isLoading } = useExamen(id)
+  const { data: pref } = usePreferencias()
   const crear = useCrearExamen()
   const actualizar = useActualizarExamen()
 
@@ -36,6 +56,9 @@ export function EditorExamen() {
     fecha: '',
     temario: '',
     nivel_preparacion: 1,
+    avisos: 'ajustes',
+    avisos_dias: [],
+    aviso_hora: HORA_AVISO_DEFECTO,
   })
   const [error, setError] = useState('')
 
@@ -48,11 +71,27 @@ export function EditorExamen() {
       fecha: examen.fecha,
       temario: examen.temario ?? '',
       nivel_preparacion: examen.nivel_preparacion,
+      avisos: examen.avisos_dias ? 'propios' : 'ajustes',
+      avisos_dias: examen.avisos_dias ?? [],
+      aviso_hora: examen.aviso_hora ? hora(examen.aviso_hora) : HORA_AVISO_DEFECTO,
     })
   }, [examen])
 
   const set = <K extends keyof Campos>(k: K, v: Campos[K]) => setC((p) => ({ ...p, [k]: v }))
   const guardando = crear.isPending || actualizar.isPending
+
+  // Al pasar a «Elegir para este examen» se parte de lo que haya en Ajustes.
+  const elegirModoAvisos = (modo: ModoAvisos) =>
+    setC((p) => ({
+      ...p,
+      avisos: modo,
+      avisos_dias:
+        modo === 'propios' && !p.avisos_dias.length ? [...(pref?.examen_dias ?? [])] : p.avisos_dias,
+    }))
+
+  const diasEfectivos = c.avisos === 'propios' ? c.avisos_dias : (pref?.examen_dias ?? [])
+  const horaEfectiva = c.avisos === 'propios' ? c.aviso_hora : HORA_AVISO_DEFECTO
+  const pasados = avisosPasados(c.fecha, diasEfectivos, horaEfectiva)
 
   async function enviar(e: FormEvent) {
     e.preventDefault()
@@ -71,6 +110,8 @@ export function EditorExamen() {
       fecha: c.fecha,
       temario: c.temario.trim() || null,
       nivel_preparacion: c.nivel_preparacion,
+      avisos_dias: c.avisos === 'propios' ? c.avisos_dias : null,
+      aviso_hora: c.avisos === 'propios' ? c.aviso_hora : null,
     }
 
     try {
@@ -156,6 +197,65 @@ export function EditorExamen() {
 
         <Campo etiqueta="Nivel de preparación">
           <NivelPreparacion valor={c.nivel_preparacion} onChange={(v) => set('nivel_preparacion', v)} />
+        </Campo>
+
+        <Campo etiqueta="Avisos">
+          <div className="flex flex-col gap-3">
+            <div role="radiogroup" aria-label="Avisos" className="grid grid-cols-2 gap-2 sm:max-w-md">
+              {OPCIONES_AVISOS.map(({ valor, etiqueta }) => {
+                const activo = c.avisos === valor
+                return (
+                  <button
+                    key={valor}
+                    type="button"
+                    role="radio"
+                    aria-checked={activo}
+                    onClick={() => elegirModoAvisos(valor)}
+                    className={`rounded-xl border px-3 py-2 text-sm font-medium transition-colors ${
+                      activo
+                        ? 'border-accent bg-accent-soft text-accent-ink'
+                        : 'border-line text-muted hover:bg-surface-2'
+                    }`}
+                  >
+                    {etiqueta}
+                  </button>
+                )
+              })}
+            </div>
+
+            {c.avisos === 'ajustes' ? (
+              <p className="text-sm text-muted">
+                {pref && `${describirAvisos(pref.examen_dias, HORA_AVISO_DEFECTO)}. `}
+                <Link to="/mas/ajustes" className="font-medium text-accent hover:underline">
+                  Cambiar en Ajustes
+                </Link>
+              </p>
+            ) : (
+              <>
+                <SelectorDiasAviso valor={c.avisos_dias} onChange={(v) => set('avisos_dias', v)} />
+                <label className="flex items-center gap-3 text-sm text-ink">
+                  A las
+                  <span className="w-32">
+                    <Input
+                      type="time"
+                      value={c.aviso_hora}
+                      onChange={(e) => set('aviso_hora', e.target.value || HORA_AVISO_DEFECTO)}
+                      required
+                    />
+                  </span>
+                </label>
+                <p className="text-sm text-muted">{describirAvisos(c.avisos_dias, c.aviso_hora)}.</p>
+              </>
+            )}
+
+            {pasados.length > 0 && (
+              <p className="text-xs text-warn">
+                Con esta fecha ya ha pasado la hora de{' '}
+                {pasados.map((d) => (d === 0 ? 'el mismo día' : `${etiquetaDias(d)} antes`)).join(', ')}
+                : {pasados.length === 1 ? 'ese aviso no se enviará' : 'esos avisos no se enviarán'}.
+              </p>
+            )}
+          </div>
         </Campo>
 
         {error && <p role="alert" className="text-sm text-crit">{error}</p>}
