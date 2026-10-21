@@ -104,10 +104,11 @@ RLS. En producción el código se elimina en el build.
   avisan en alto si se llaman; para recuperarlos, quita el alias de `vite.config.ts`.
   (`functions-js` tuvo stub hasta que los apuntes empezaron a llamar a una Edge Function.)
 - **Apuntes de examen**: Edge Function `generar-apuntes` (verify_jwt on; reenvía el JWT
-  del usuario, así que RLS aplica) llama a Claude (`claude-opus-5-5`, salida JSON con
-  esquema, `fallbacks: "default"`) y guarda en `apuntes_examen` (uno por examen).
-  Necesita el secreto `ANTHROPIC_API_KEY` en las Edge Functions. No van en las copias
-  de seguridad: se pueden regenerar.
+  del usuario, así que RLS aplica) y guarda en `apuntes_examen` (uno por examen). El
+  proveedor lo decide el secreto presente: `ANTHROPIC_API_KEY` → Claude
+  (`claude-opus-5-5`, `fallbacks: "default"`), si no `GEMINI_API_KEY` → Gemini
+  (`gemini-2.5-flash`, plan gratuito con límite diario). Mismo prompt y mismo esquema
+  JSON para los dos. No van en las copias de seguridad: se pueden regenerar.
 - Charts = barras `div`, sin librería.
 
 ## Convenciones al añadir cosas

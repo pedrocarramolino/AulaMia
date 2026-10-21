@@ -214,9 +214,10 @@ export function useApuntesExamen(examenId: string | undefined) {
 
 const ERRORES_APUNTES: Record<string, string> = {
   falta_clave:
-    'Falta configurar la clave de Anthropic: añade el secreto ANTHROPIC_API_KEY en las Edge Functions de Supabase.',
-  clave_invalida: 'La clave de Anthropic no es válida o no tiene saldo.',
-  limite: 'Demasiadas peticiones seguidas. Prueba de nuevo en un minuto.',
+    'Falta configurar la clave: añade el secreto GEMINI_API_KEY (gratis) o ANTHROPIC_API_KEY en las Edge Functions de Supabase.',
+  clave_invalida: 'La clave configurada no es válida (o, si es de Anthropic, no tiene saldo).',
+  limite:
+    'Has llegado al límite de peticiones. Si usas el plan gratuito de Gemini, se renueva cada día; si no, prueba en un minuto.',
   rechazado: 'No se han podido generar estos apuntes. Prueba a describir el examen de otra forma.',
   demasiado_largo:
     'El examen abarca demasiado para unos apuntes. Prueba a centrarlo en menos temas.',
