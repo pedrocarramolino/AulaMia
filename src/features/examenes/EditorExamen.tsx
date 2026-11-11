@@ -5,6 +5,7 @@ import { Campo, Input, Select, Textarea, InputFecha } from '@/components/campos'
 import { IconoFlechaIzq } from '@/components/iconos'
 import { useAlumnos } from '@/features/alumnos/api'
 import { useMaterias } from '@/features/materias/api'
+import { SelectorMateria } from '@/features/materias/componentes'
 import { usePreferencias } from '@/features/recordatorios/api'
 import {
   HORA_AVISO_DEFECTO,
@@ -154,14 +155,7 @@ export function EditorExamen() {
             </Select>
           </Campo>
           <Campo etiqueta="Materia">
-            <Select value={c.materia_id} onChange={(e) => set('materia_id', e.target.value)}>
-              <option value="">Sin materia</option>
-              {materias?.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.nombre}
-                </option>
-              ))}
-            </Select>
+            <SelectorMateria value={c.materia_id} onChange={(id) => set('materia_id', id)} />
           </Campo>
         </div>
 

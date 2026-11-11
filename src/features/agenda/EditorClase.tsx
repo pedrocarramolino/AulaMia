@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { CabeceraPagina, Boton, Cargando } from '@/components/ui'
 import { Campo, Input, Select, InputFecha } from '@/components/campos'
@@ -6,7 +6,7 @@ import { IconoFlechaIzq } from '@/components/iconos'
 import { DURACIONES, duracionLegible, hora, sumarMinutos, aMinutos, aISO } from '@/lib/fechas'
 import { addDays } from 'date-fns'
 import { useAlumnos } from '@/features/alumnos/api'
-import { useMaterias } from '@/features/materias/api'
+import { SelectorMateria } from '@/features/materias/componentes'
 import { useClase, useCrearClase, useActualizarClase, mensajeErrorClase } from './api'
 
 interface Campos {
@@ -26,7 +26,6 @@ export function EditorClase() {
   const navigate = useNavigate()
 
   const { data: alumnos } = useAlumnos()
-  const { data: materias } = useMaterias()
   const { data: base, isLoading: cargandoBase } = useClase(id ?? duplicarId)
 
   const crear = useCrearClase()
@@ -60,8 +59,6 @@ export function EditorClase() {
   const titulo = editar ? 'Editar clase' : duplicarId ? 'Duplicar clase' : 'Nueva clase'
   const volverA = editar ? `/agenda/clase/${id}` : '/agenda'
   const guardando = crear.isPending || actualizar.isPending
-
-  const materiasVisibles = useMemo(() => materias ?? [], [materias])
 
   async function enviar(e: FormEvent) {
     e.preventDefault()
@@ -126,14 +123,7 @@ export function EditorClase() {
         </Campo>
 
         <Campo etiqueta="Materia">
-          <Select value={c.materia_id} onChange={(e) => set('materia_id', e.target.value)}>
-            <option value="">Sin materia</option>
-            {materiasVisibles.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.nombre}
-              </option>
-            ))}
-          </Select>
+          <SelectorMateria value={c.materia_id} onChange={(id) => set('materia_id', id)} />
         </Campo>
 
         {!editar && (
